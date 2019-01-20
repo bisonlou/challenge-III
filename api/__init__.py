@@ -1,12 +1,13 @@
 from flask import Flask
-from flask_jwt_extended import JWTManager
+from flask_sqlalchemy import SQLAlchemy
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = 'bison'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql+psycopg2://postgres:system#2008@localhost/ireporter'
+db = SQLAlchemy(app)
 
-jwt = JWTManager(app)
+
 test_client = app.test_client()
 
-import api.views.red_flag_view
 import api.views.user_view
-import api.views.intervention_view
+import api.views.error_view
+

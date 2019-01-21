@@ -72,7 +72,6 @@ class UserValidator():
             return True
 
         keys.pop()
-        print(keys)
 
         # get list of keys with missing data
         missing_data = [key for key in keys if len(data[key]) == 0]
@@ -82,7 +81,7 @@ class UserValidator():
         return False
 
     def has_proper_email(self, email):
-        return validate_email(email, verify=True)
+        return validate_email(email)
     
 
     

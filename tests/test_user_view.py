@@ -26,7 +26,6 @@ class TestUserView(unittest.TestCase):
         user = {
             'user_name': 'bison',
             'email': 'bisonlou@gmail.com',
-            'date_registered': '2019-01-01',
             'first_name': 'bison',
             'last_name': 'lou',
             'phone_number': '0753669897',
@@ -50,7 +49,6 @@ class TestUserView(unittest.TestCase):
         user = {
             'user_name': 'bison',
             'email': 'bisonlou@aol.com',
-            'date_registered': '2019-01-01',
             'first_name': 'bison',
             'last_name': 'lou',
             'phone_number': '0753669897',
@@ -76,7 +74,6 @@ class TestUserView(unittest.TestCase):
         """
         user = {
             'user_name': 'bison',
-            'date_registered': '2019-01-01',
             'first_name': 'bison',
             'last_name': 'lou',
             'phone_number': '0753669897',
@@ -100,7 +97,6 @@ class TestUserView(unittest.TestCase):
         user = {
             'user_name': 'bison',
             'email': 'bisonlou@gmail.com',
-            'date_registered': '2019-01-01',
             'first_name': '',
             'last_name': 'lou',
             'phone_number': '0753669897',
@@ -124,7 +120,6 @@ class TestUserView(unittest.TestCase):
         user = {
             'user_name': 'bison',
             'email': 'bisonlou@gmail.com',
-            'date_registered': '2019-01-01',
             'first_name': 'bison',
             'last_name': 'lou',
             'phone_number': '0753669897',
@@ -151,7 +146,6 @@ class TestUserView(unittest.TestCase):
         user = {
             'user_name': 'bison',
             'email': 'bisonlougmail.com',
-            'date_registered': '2019-01-01',
             'first_name': 'bison',
             'last_name': 'lou',
             'phone_number': '0753669897',
@@ -175,7 +169,6 @@ class TestUserView(unittest.TestCase):
         user = {
             'user_name': 'bison',
             'email': 'bisonlou@gmail.com',
-            'date_registered': '2019-01-01',
             'first_name': 'bison',
             'last_name': 'lou',
             'phone_number': '0753669897',
@@ -204,7 +197,6 @@ class TestUserView(unittest.TestCase):
         user = {
             'user_name': 123,
             'email': 'bisonlou@gmail.com',
-            'date_registered': '2019-01-01',
             'first_name': 'bison',
             'last_name': 'lou',
             'phone_number': '0753669897',

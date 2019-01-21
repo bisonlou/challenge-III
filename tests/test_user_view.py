@@ -1,7 +1,7 @@
 import unittest
 import json
-from api import app, test_client, db
-from api.models.user_model import User
+from api import app, test_client
+from api.models.user_model import User, UserServices
 
 
 class TestUserView(unittest.TestCase):
@@ -11,17 +11,13 @@ class TestUserView(unittest.TestCase):
         Setup test client
         """
         self.test_client = test_client   
+        self.user_services = UserServices() 
 
     def tearDown(self):
         """
         teardown test client
         """
-        users = User.query.all()
-        if len(users) > 0:
-            for user in users:
-                db.session.delete(user)
-
-        db.session.commit()        
+        self.user_services.remove_all()        
 
     def test_register_user_succesfuly(self):
         """
@@ -39,7 +35,7 @@ class TestUserView(unittest.TestCase):
         }
 
         response = self.test_client.post(
-            '/api/v1/register',
+            '/api/v1/auth/signup',
             content_type='application/json',
             data=json.dumps(user))
 
@@ -63,7 +59,7 @@ class TestUserView(unittest.TestCase):
         }
 
         response = self.test_client.post(
-            '/api/v1/register',
+            '/api/v1/auth/signup',
             content_type='application/json',
             data=json.dumps(user))
 
@@ -89,7 +85,7 @@ class TestUserView(unittest.TestCase):
         }
 
         response = self.test_client.post(
-            '/api/v1/register',
+            '/api/v1/auth/signup',
             content_type='application/json',
             data=json.dumps(user))
 
@@ -103,7 +99,7 @@ class TestUserView(unittest.TestCase):
         """
         user = {
             'user_name': 'bison',
-            'email': 'bisonlou@aol.com',
+            'email': 'bisonlou@gmail.com',
             'date_registered': '2019-01-01',
             'first_name': '',
             'last_name': 'lou',
@@ -113,7 +109,7 @@ class TestUserView(unittest.TestCase):
         }
 
         response = self.test_client.post(
-            '/api/v1/register',
+            '/api/v1/auth/signup',
             content_type='application/json',
             data=json.dumps(user))
 
@@ -127,7 +123,7 @@ class TestUserView(unittest.TestCase):
         """
         user = {
             'user_name': 'bison',
-            'email': 'bisonlou@aol.com',
+            'email': 'bisonlou@gmail.com',
             'date_registered': '2019-01-01',
             'first_name': 'bison',
             'last_name': 'lou',
@@ -137,7 +133,7 @@ class TestUserView(unittest.TestCase):
         }
 
         response = self.test_client.post(
-            '/api/v1/register',
+            '/api/v1/auth/signup',
             content_type='application/json',
             data=json.dumps(user))
 
@@ -164,7 +160,7 @@ class TestUserView(unittest.TestCase):
         }
 
         response = self.test_client.post(
-            '/api/v1/register',
+            '/api/v1/auth/signup',
             content_type='application/json',
             data=json.dumps(user))
 
@@ -188,12 +184,12 @@ class TestUserView(unittest.TestCase):
         }
 
         self.test_client.post(
-            '/api/v1/register',
+            '/api/v1/auth/signup',
             content_type='application/json',
             data=json.dumps(user))
 
         response = self.test_client.post(
-            '/api/v1/register',
+            '/api/v1/auth/signup',
             content_type='application/json',
             data=json.dumps(user))
 
@@ -201,5 +197,31 @@ class TestUserView(unittest.TestCase):
 
         self.assertEqual(response.status_code, 409)
 
+    def test_register_with_improper_type(self):
+        """
+        Test registering a user a second time
+        """
+        user = {
+            'user_name': 123,
+            'email': 'bisonlou@gmail.com',
+            'date_registered': '2019-01-01',
+            'first_name': 'bison',
+            'last_name': 'lou',
+            'phone_number': '0753669897',
+            'password': 'Pa$$word123',
+            'other_names': 'innocent'
+        }
 
-   
+        self.test_client.post(
+            '/api/v1/auth/signup',
+            content_type='application/json',
+            data=json.dumps(user))
+
+        response = self.test_client.post(
+            '/api/v1/auth/signup',
+            content_type='application/json',
+            data=json.dumps(user))
+
+        message = json.loads(response.data)
+
+        self.assertEqual(response.status_code, 400)

@@ -1,18 +1,140 @@
-from api import db
+import psycopg2
+import psycopg2.extras
+
+class User():
+
+    def __init__(self, **kwags):
+        self._id = kwags.get('id', 0)
+        self._user_name = kwags['user_name']
+        self._email = kwags['email']
+        self._password = kwags['password']
+        self._phone_number = kwags['phone_number']
+        self._date_registered = kwags['date_registered']
+        self._first_name = kwags['first_name']
+        self._last_name = kwags['last_name']
+        self._other_names = kwags['other_names']
+        self._is_admin = kwags['is_admin']
+
+    @property
+    def id(self):
+        return self._id
+
+    @property
+    def email(self):
+        return self._email
+
+    @property
+    def password(self):
+        return self._password
+
+    @property
+    def is_admin(self):
+        return self._is_admin
+         
+    @property
+    def user_name(self):
+        return self._user_name
+
+    @property
+    def first_name(self):
+        return self._first_name
+
+    @property
+    def last_name(self):
+        return self._last_name
+
+    @property
+    def other_names(self):
+        return self._other_names
+
+    @property
+    def phone_number(self):
+        return self._phone_number
+
+    @property
+    def date_registered(self):
+        return self._date_registered    
 
 
-class User(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    userName = db.Column(db.String(80), unique=True, nullable=False)
-    email = db.Column(db.String(120), unique=True, nullable=False)
-    phoneNumber = db.Column(db.String(20), nullable=False)
-    firstName = db.Column(db.String(20), nullable=False)
-    lastName = db.Column(db.String(20), nullable=False)
-    otherNames = db.Column(db.String(20), nullable=True)
-    password = db.Column(db.String(120), nullable=False)
-    isAdmin = db.Column(db.Boolean, default=False)
-    dteRegistered = db.Column(db.DateTime(), nullable=False)
+class UserServices():
 
+    def __init__(self):
 
+        self.db_name = 'ireporter'
 
-    
+        try:
+            self.connection = psycopg2.connect(
+                dbname=self.db_name, user='postgres', host='localhost', password='', port=5432
+            )
+            self.connection.autocommit = True
+            self.cursor = self.connection.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+
+            create_users_table = "CREATE TABLE IF NOT EXISTS users \
+                                 (id SERIAL NOT NULL PRIMARY KEY, \
+                                 userName TEXT NOT NULL,\
+                                 email TEXT NOT NULL,\
+                                 password TEXT NOT NULL,\
+                                 firstName TEXT NOT NULL,\
+                                 lastName TEXT NOT NULL,\
+                                 otherNames TEXT NOT NULL,\
+                                 phoneNumber TEXT NOT NULL,\
+                                 dteRegistered TEXT NOT NULL,\
+                                 isAdmin Boolean NOT NULL\
+                                 );"
+
+            self.cursor.execute(create_users_table)
+
+        except:
+            print('Failed to connect to the database.')
+
+    def add_user(self, user):
+        new_user = "INSERT INTO users \
+                    (username, email, password, firstName,\
+                    lastName, otherNames, phoneNumber, dteRegistered, isAdmin)\
+                    VALUES('{}', '{}', '{}','{}', '{}', '{}','{}', '{}', '{}');".format(
+                        user.user_name, user.email, user.password, user.first_name,
+                        user.last_name, user.other_names, user.phone_number,
+                         user.date_registered, user.is_admin)
+
+        self.cursor.execute(new_user)
+        inserted_user = self.get_user_by_email(user.email)
+        return inserted_user
+
+    def get_user_by_id(self, user_id):
+        return self.get_user('id', user_id)
+
+    def get_user_by_email(self, login_email):
+        return self.get_user('email', login_email)
+
+    def get_user(self, key, value):
+        if key == 'id':
+            select_query = "SELECT * FROM users WHERE users.id = {};".format(value)
+        elif key == 'email':
+            select_query = "SELECT * FROM users WHERE users.email = '{}';".format(value)
+
+        self.cursor.execute(select_query)
+        user = self.cursor.fetchone()
+        # only return if ther is a user found
+        if not user is None:
+            return user
+
+    # def get_all(self):
+    #     return [user.to_dict() for user in user_table]
+
+    # # def delete_user(self, user_id):
+    # #     users = self.get_user(user_id)
+    # #     if len(users) > 0:
+    # #         user_table.remove(users[0])
+
+    # # def promote_user(self, user_id):
+    # #     users = self.get_user_by_id(user_id)
+    # #     if len(users) > 0:
+    # #         users[0].is_admin = True
+
+    # def count(self):
+    #     return len(user_table)
+
+    def remove_all(self):
+        delete_query = 'DELETE FROM users;'
+        self.cursor.execute(delete_query)
+        

@@ -4,7 +4,7 @@ from api.controllers.user_controller import UserController
 user_controller = UserController()
 
 
-@app.route('/api/v1/register', methods=['POST'])
+@app.route('/api/v1/auth/signup', methods=['POST'])
 def register_user():
 
     return user_controller.register()

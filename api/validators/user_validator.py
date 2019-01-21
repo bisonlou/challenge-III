@@ -1,7 +1,8 @@
 import re
 from validate_email import validate_email
-from api.models.user_model import User
+from api.models.user_model import User, UserServices
 
+user_services = UserServices()
 
 class UserValidator():
 
@@ -15,7 +16,7 @@ class UserValidator():
         if self.has_missing_keys(data):
             return False            
 
-        if self.has_empty_keys(data):
+        if self.has_bad_data(data):
             return False
 
         if not self.has_proper_email(data['email']):
@@ -24,8 +25,8 @@ class UserValidator():
         return True
     
     def duplicate_email(self, email):
-        user_count = User.query.filter_by(email=email).count()
-        if user_count > 0:
+        user = user_services.get_user_by_email(email)
+        if user:
             return True
         return False
         
@@ -50,6 +51,7 @@ class UserValidator():
 
         return errors
 
+
     def has_missing_keys(self, data):
         keys = ['user_name', 'password', 'first_name',
                 'last_name', 'email', 'phone_number',
@@ -61,14 +63,21 @@ class UserValidator():
             return True        
         return False
         
-    def has_empty_keys(self, data):
+    def has_bad_data(self, data):
         keys = ['user_name', 'first_name', 'last_name',
-                'email', 'phone_number']
+                'email', 'phone_number', 'other_names']        
+
+        improper_type = [key for key in keys if type(data[key]) is not str]
+        if len(improper_type):
+            return True
+
+        keys.pop()
 
         # get list of keys with missing data
         missing_data = [key for key in keys if len(data[key]) == 0]
         if len(missing_data):
-            return True
+            return True   
+
         return False
 
     def has_proper_email(self, email):

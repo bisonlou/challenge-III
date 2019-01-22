@@ -40,6 +40,7 @@ class UserController():
         data['is_admin'] = False
 
         new_user = User(**data)
+
         user = user_services.add_user(new_user)
 
         success_response = {'user': user, 'token': 'User created'}
@@ -50,6 +51,7 @@ class UserController():
         Function to login a user
         The user must be registered
         The function returns a json web token
+
 
         '''
         data = request.get_json()
@@ -69,3 +71,4 @@ class UserController():
                                 'token': access_token.decode("utf-8")}
             return jsonify({'status': 200, 'data': [success_response]}), 200
         abort(401)
+

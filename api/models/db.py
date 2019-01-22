@@ -72,7 +72,7 @@ class DbConnection():
         self.cursor.execute(select_query)
         user = self.cursor.fetchone()
         # only return if ther is a user found
-        if is not user:
+        if user:
             return user
 
     # def get_all(self):

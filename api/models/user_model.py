@@ -63,12 +63,12 @@ class UserServices():
         self.db_name = 'ireporter'
 
         try:
-            # self.connection = psycopg2.connect(
-            #     dbname=self.db_name, user='postgres', host='localhost', password=''
-            # )
             self.connection = psycopg2.connect(
-                dbname=self.db_name, user='postgres', host='localhost', password='system#2008', port=5432
+                dbname=self.db_name, user='postgres', host='localhost', password=''
             )
+            # self.connection = psycopg2.connect(
+            #     dbname=self.db_name, user='postgres', host='localhost', password='system#2008', port=5432
+            # )
             self.connection.autocommit = True
             self.cursor = self.connection.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
 

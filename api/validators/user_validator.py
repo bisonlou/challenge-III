@@ -1,8 +1,9 @@
 import re
 from validate_email import validate_email
-from api.models.user_model import User, UserServices
+from api.models.user_model import User
+from api.models.db import DbConnection
 
-user_services = UserServices()
+user_services = DbConnection()
 
 
 class UserValidator():

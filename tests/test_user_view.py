@@ -1,7 +1,8 @@
 import unittest
 import json
 from api import app, test_client
-from api.models.user_model import User, UserServices
+from api.models.user_model import User
+from api.models.db import DbConnection
 
 
 class TestUserView(unittest.TestCase):
@@ -11,13 +12,13 @@ class TestUserView(unittest.TestCase):
         Setup test client
         """
         self.test_client = test_client   
-        self.user_services = UserServices()         
+        self.db_services = DbConnection()       
 
     def tearDown(self):
         """
         teardown test client
         """
-        self.user_services.remove_all()        
+        self.db_services.delete_all_users()        
 
     def test_register_user_succesfuly(self):
         """

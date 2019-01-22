@@ -1,13 +1,14 @@
 from datetime import datetime
-from api import app
-from api.models.user_model import User, UserServices
+from api import app, jwt
+from api.models.user_model import User
+from api.models.db import DbConnection
 from api.validators.user_validator import UserValidator
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask import jsonify, abort, request
-import jwt
+from flask_jwt_extended import create_access_token, get_jwt_identity
 
 validator = UserValidator()
-user_services = UserServices()
+db_services = DbConnection()
 
 
 class UserController():
@@ -40,8 +41,7 @@ class UserController():
         data['is_admin'] = False
 
         new_user = User(**data)
-
-        user = user_services.add_user(new_user)
+        user = db_services.add_user(new_user)
 
         success_response = {'user': user, 'token': 'User created'}
         return jsonify({'status': 201, 'data': [success_response]}), 201
@@ -58,17 +58,14 @@ class UserController():
         if not validator.has_login_required_fields(data):
             abort(400)
 
-        user = user_services.get_user_by_email(data['email'])
+        user = db_services.get_user_by_email(data['email'])
         if not user:
             abort(401)
 
-        token = jwt.encode({'id': user['id']}, app.config['SECRET_KEY'],
-                           algorithm='HS256')
-
         if check_password_hash(user['password'], data['password']):
-            access_token = token
+            access_token = create_access_token(identity=user['id'])
             success_response = {'user': user,
-                                'token': access_token.decode("utf-8")}
+                                'access_token': access_token}
             return jsonify({'status': 200, 'data': [success_response]}), 200
         abort(401)
 

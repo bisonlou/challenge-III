@@ -21,7 +21,7 @@ class UserController():
         Function to register a user
         '''
         data = request.get_json()
-        
+
         if not validator.has_required_fields(data):
             abort(400)
 
@@ -30,16 +30,17 @@ class UserController():
             return jsonify({'status': 400, 'data': errors}), 400
 
         if validator.duplicate_email(data['email']):
-            abort(409)      
-        
+            abort(409)
+
         hashed_password = generate_password_hash(
-                            data['password'], method='sha256')
+            data['password'], method='sha256')
 
         data['date_registered'] = dteRegistered = datetime.utcnow().date()
         data['password'] = hashed_password
         data['is_admin'] = False
 
-        new_user = User(**data)  
+        new_user = User(**data)
+
         user = user_services.add_user(new_user)
 
         success_response = {'user': user, 'token': 'User created'}
@@ -49,7 +50,8 @@ class UserController():
         '''
         Function to login a user
         The user must be registered
-        The function returns a jason web token
+        The function returns a json web token
+
 
         '''
         data = request.get_json()
@@ -59,14 +61,14 @@ class UserController():
         user = user_services.get_user_by_email(data['email'])
         if not user:
             abort(401)
-        
-        key = 'secret'
-        token = jwt.encode({'id': user['id']}, key, algorithm='HS256').decode("utf-8") 
-        
+
+        token = jwt.encode({'id': user['id']}, app.config['SECRET_KEY'],
+                           algorithm='HS256')
+
         if check_password_hash(user['password'], data['password']):
             access_token = token
-            success_response = {'user': user, 'token': access_token}
+            success_response = {'user': user,
+                                'token': access_token.decode("utf-8")}
             return jsonify({'status': 200, 'data': [success_response]}), 200
         abort(401)
 
-   

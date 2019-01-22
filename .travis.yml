@@ -1,0 +1,22 @@
+language: python
+
+python: 
+  - 3.6
+
+
+install:
+  - pip install -r requirements.txt
+  - pip install pytest-cov
+  - pip install coveralls
+
+services:
+  - postgresql
+
+before_script:
+  - psql -c 'create database ireporter;' -U postgres
+
+script:
+  - pytest --cov
+  
+after_success:
+  - coveralls

@@ -2,11 +2,13 @@ from flask import Flask
 from flask_jwt_extended import JWTManager
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = 'bison'
 
 jwt = JWTManager(app)
-test_client = app.test_client()
 
-import api.views.red_flag_view
+test_client = app.test_client()
+app.config['SECRET_KEY'] = 'askjfskdkjvisewkjsdvkj876k,.'
+
 import api.views.user_view
-import api.views.intervention_view
+import api.views.error_view
+import api.models.user_model
+

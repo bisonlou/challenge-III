@@ -1,17 +1,24 @@
 import psycopg2
 import psycopg2.extras
 
+
 class DbConnection():
 
     def __init__(self):
         self.db_name = 'ireporter'
 
         try:
+            # self.connection = psycopg2.connect(
+            #     dbname=self.db_name, user='postgres', host='localhost',
+            #     password='system#2008', port=5432
+            # )
             self.connection = psycopg2.connect(
-                dbname=self.db_name, user='postgres', host='localhost', password='system#2008', port=5432
-            )
+                dbname=self.db_name, user='postgres', host='localhost',
+                password='')
+
             self.connection.autocommit = True
-            self.cursor = self.connection.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+            self.cursor = self.connection.cursor(
+                cursor_factory=psycopg2.extras.RealDictCursor)
 
             create_tables = '''
                             CREATE TABLE IF NOT EXISTS public.users (id SERIAL NOT NULL PRIMARY KEY, userName TEXT NOT NULL,
@@ -33,19 +40,19 @@ class DbConnection():
             self.cursor.execute(create_tables)
         except:
             print('Failed to connect to the database.')
-    
+
     def add_user(self, user):
         new_user = "INSERT INTO users \
                     (username, email, password, firstName,\
                     lastName, otherNames, phoneNumber, dteRegistered, isAdmin)\
                     VALUES('{}', '{}', '{}','{}', '{}', '{}','{}', '{}', '{}');".format(
-                        user.user_name, user.email, user.password, user.first_name,
-                        user.last_name, user.other_names, user.phone_number,
-                         user.date_registered, user.is_admin)
-        
+            user.user_name, user.email, user.password, user.first_name,
+            user.last_name, user.other_names, user.phone_number,
+            user.date_registered, user.is_admin)
+
         self.cursor.execute(new_user)
         inserted_user = self.get_user_by_email(user.email)
-        
+
         return inserted_user
 
     def get_user_by_id(self, user_id):
@@ -56,14 +63,16 @@ class DbConnection():
 
     def get_user(self, key, value):
         if key == 'id':
-            select_query = "SELECT * FROM users WHERE users.id = {};".format(value)
+            select_query = "SELECT * FROM users WHERE users.id = {};".format(
+                value)
         elif key == 'email':
-            select_query = "SELECT * FROM users WHERE users.email = '{}';".format(value)
+            select_query = "SELECT * FROM users \
+                            WHERE users.email = '{}';".format(value)
 
         self.cursor.execute(select_query)
         user = self.cursor.fetchone()
         # only return if ther is a user found
-        if not user is None:
+        if is not user:
             return user
 
     # def get_all(self):
@@ -88,13 +97,14 @@ class DbConnection():
 
     def insert_incident(self, incident):
         new_incident = "INSERT INTO incidents \
-                    (createdOn, title, comment, type, createdBy, location, status) \
+                    (createdOn, title, comment, type,\
+                     createdBy, location, status) \
                     VALUES('{}', '{}', '{}','{}', '{}', '{}','{}');".format(
-                        incident.created_on, incident.title, incident.comment,
-                        incident.incident_type, incident.created_by, incident.location,
-                        incident.status)
-        
-        self.cursor.execute(new_incident)        
+            incident.created_on, incident.title, incident.comment,
+            incident.incident_type, incident.created_by, incident.location,
+            incident.status)
+
+        self.cursor.execute(new_incident)
 
     def count(self, incident_type):
         if incident_type == 'red-flag':

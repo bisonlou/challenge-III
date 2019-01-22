@@ -4,6 +4,7 @@ from api.models.user_model import User, UserServices
 from api.validators.user_validator import UserValidator
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask import jsonify, abort, request
+import jwt
 
 validator = UserValidator()
 user_services = UserServices()
@@ -39,10 +40,33 @@ class UserController():
         data['is_admin'] = False
 
         new_user = User(**data)  
-
         user = user_services.add_user(new_user)
 
         success_response = {'user': user, 'token': 'User created'}
-
         return jsonify({'status': 201, 'data': [success_response]}), 201
+
+    def login(self):
+        '''
+        Function to login a user
+        The user must be registered
+        The function returns a jason web token
+
+        '''
+        data = request.get_json()
+        if not validator.has_login_required_fields(data):
+            abort(400)
+
+        user = user_services.get_user_by_email(data['email'])
+        if not user:
+            abort(401)
+        
+        key = 'secret'
+        token = jwt.encode({'id': user['id']}, key, algorithm='HS256').decode("utf-8") 
+        
+        if check_password_hash(user['password'], data['password']):
+            access_token = token
+            success_response = {'user': user, 'token': access_token}
+            return jsonify({'status': 200, 'data': [success_response]}), 200
+        abort(401)
+
    

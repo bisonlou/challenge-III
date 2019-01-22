@@ -82,6 +82,21 @@ class UserValidator():
 
     def has_proper_email(self, email):
         return validate_email(email)
+
+    def has_login_required_fields(self, data):
+        '''
+        Function to check if the login data is present
+        Returns True on success otherwise False
+
+        '''
+        keys = ['email', 'password']
+
+        missing_data = [key for key in keys 
+                        if key not in data or len(data[key]) == 0]
+        if len(missing_data): 
+            return False
+
+        return True
     
 
     

@@ -5,15 +5,15 @@ class User():
 
     def __init__(self, **kwags):
         self._id = kwags.get('id', 0)
-        self._user_name = kwags['user_name']
-        self._email = kwags['email']
-        self._password = kwags['password']
-        self._phone_number = kwags['phone_number']
-        self._date_registered = kwags['date_registered']
-        self._first_name = kwags['first_name']
-        self._last_name = kwags['last_name']
-        self._other_names = kwags['other_names']
-        self._is_admin = kwags['is_admin']
+        self._user_name = kwags.get('user_name','')
+        self._email = kwags.get('email', '')
+        self._password = kwags.get('password','')
+        self._phone_number = kwags.get('phone_number','')
+        self._date_registered = kwags.get('date_registered','')
+        self._first_name = kwags.get('first_name', '')
+        self._last_name = kwags.get('last_name','')
+        self._other_names = kwags.get('other_names','')
+        self._is_admin = kwags.get('is_admin','')
 
     @property
     def id(self):
@@ -63,12 +63,12 @@ class UserServices():
         self.db_name = 'ireporter'
 
         try:
-            self.connection = psycopg2.connect(
-                dbname=self.db_name, user='postgres', host='localhost', password=''
-            )
             # self.connection = psycopg2.connect(
-            #     dbname=self.db_name, user='postgres', host='localhost', password='system#2008', port=5432
+            #     dbname=self.db_name, user='postgres', host='localhost', password=''
             # )
+            self.connection = psycopg2.connect(
+                dbname=self.db_name, user='postgres', host='localhost', password='system#2008', port=5432
+            )
             self.connection.autocommit = True
             self.cursor = self.connection.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
 
@@ -101,6 +101,7 @@ class UserServices():
 
         self.cursor.execute(new_user)
         inserted_user = self.get_user_by_email(user.email)
+        
         return inserted_user
 
     def get_user_by_id(self, user_id):

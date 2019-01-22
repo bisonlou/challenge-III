@@ -11,7 +11,7 @@ class TestUserView(unittest.TestCase):
         Setup test client
         """
         self.test_client = test_client   
-        self.user_services = UserServices() 
+        self.user_services = UserServices()         
 
     def tearDown(self):
         """

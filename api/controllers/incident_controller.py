@@ -42,8 +42,21 @@ class IncidentController():
         success_response = {
             'id': 1,
             'message': 'Created {} record'.format(incident_type)
-            }
+        }
 
         return jsonify({'status': 201, 'data': [success_response]}), 201
 
-    
+    def get_incidents(self, incident_type):
+        '''
+        Function to retun all incident given an incident id
+
+        '''
+        user_id = get_jwt_identity()
+
+        user = db_services.get_user_by_id(user_id)
+
+        incidents = db_services.get_all_incidents(
+                    user_id, user['isadmin'], incident_type
+                    )
+
+        return jsonify({'status': 200, 'data': [incidents]})

@@ -26,3 +26,9 @@ def index():
 def create_incident():
     return incident_controller.create_incident()
 
+
+@app.route('/api/v1/incidents/<string:incident_type>', methods=['GET'])
+@jwt_required
+def get_incidents(incident_type):
+
+    return incident_controller.get_incidents(incident_type)

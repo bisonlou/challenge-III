@@ -13,8 +13,7 @@ class DbConnection():
             #     password='system#2008', port=5432
             # )
             self.connection = psycopg2.connect(
-                dbname=self.db_name, user='postgres', host='localhost',
-                password='')
+                dbname=self.db_name, user='postgres', password='')
 
             self.connection.autocommit = True
             self.cursor = self.connection.cursor(
@@ -112,20 +111,22 @@ class DbConnection():
         elif incident_type == 'intervention':
             return len(intervention_table)
 
-    def get_all(self, user_id, is_admin, incident_type):
-        # check  incident type
-        table = []
-        if incident_type == 'red-flag':
-            table = redflag_table
-        if incident_type == 'intervention':
-            table = intervention_table
-
+    def get_all_incidents(self, user_id, is_admin, incident_type):
+        query = ""
         # check if user is admin
         if is_admin is True:
-            return [incident.to_dict() for incident in table]
+            incidents_query = "SELECT * FROM incidents WHERE \
+                    type = '{}'".format(incident_type)
         else:
-            return [incident.to_dict() for incident in table
-                    if incident.created_by == user_id]
+            incidents_query = "SELECT * FROM incidents WHERE \
+                    type = '{}' AND createdby = {}".format(
+                    incident_type, user_id
+                    )
+
+        self.cursor.execute(incidents_query)
+        returned_incidents = self.cursor.fetchall()
+
+        return returned_incidents
 
     def delete_all_incidents(self):
         delete_query = 'DELETE FROM incidents;'

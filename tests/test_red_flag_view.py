@@ -168,3 +168,33 @@ class TestRedFlagView(unittest.TestCase):
         message = json.loads(response.data)
 
         self.assertEqual(message['status'], 400)
+
+    def test_get_all_red_flags_as_admin(self):
+        """
+        Test getting all red flags as a normal user
+        token is by an administrative user
+        2 red flag expected
+        """
+        response = self.test_client.get(
+            '/api/v1/incidents/red-flag',
+            headers={'Authorization': 'Bearer ' +
+                     self.admin_token['data'][0]['access_token']})
+        message = json.loads(response.data)
+
+        self.assertEqual(response.status_code, 200)
+
+    # def test_get_all_redflags_as_non_admin(self):
+    #     """
+    #     Test getting all red flags when user is not admin
+    #     """
+    #     response = self.test_client.get(
+    #         '/api/v1/incidents/red-flag',
+    #         headers={'Authorization': 'Bearer ' +
+    #                  self.non_admin_token['access_token']})
+    #     message = json.loads(response.data)
+
+    #     self.assertEqual(message['status'], 200)
+    #     self.assertEqual(len(message['data']), 1)
+    #     self.assertEqual(response.status_code, 200)
+
+    

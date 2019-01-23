@@ -1,5 +1,3 @@
-import psycopg2
-import psycopg2.extras
 
 class User():
 
@@ -56,92 +54,8 @@ class User():
         return self._date_registered    
 
 
-class UserServices():
 
-    def __init__(self):
+       
 
-        self.db_name = 'ireporter'
-
-        try:
-            # self.connection = psycopg2.connect(
-            #     dbname=self.db_name, user='postgres', host='localhost', password=''
-            # )
-            # self.connection = psycopg2.connect(
-            #     dbname=self.db_name, user='postgres', host='localhost', password='system#2008', port=5432
-            # )
-            self.connection = psycopg2.connect(
-                dbname=self.db_name, user='postgres', host='localhost', password='andela', port=5432
-            )
-            self.connection.autocommit = True
-            self.cursor = self.connection.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
-
-            create_users_table = "CREATE TABLE IF NOT EXISTS users \
-                                 (id SERIAL NOT NULL PRIMARY KEY, \
-                                 userName TEXT NOT NULL,\
-                                 email TEXT NOT NULL,\
-                                 password TEXT NOT NULL,\
-                                 firstName TEXT NOT NULL,\
-                                 lastName TEXT NOT NULL,\
-                                 otherNames TEXT NOT NULL,\
-                                 phoneNumber TEXT NOT NULL,\
-                                 dteRegistered TEXT NOT NULL,\
-                                 isAdmin Boolean NOT NULL\
-                                 );"
-
-            self.cursor.execute(create_users_table)
-
-        except:
-            print('Failed to connect to the database.')
-
-    def add_user(self, user):
-        new_user = "INSERT INTO users \
-                    (username, email, password, firstName,\
-                    lastName, otherNames, phoneNumber, dteRegistered, isAdmin)\
-                    VALUES('{}', '{}', '{}','{}', '{}', '{}','{}', '{}', '{}');".format(
-                        user.user_name, user.email, user.password, user.first_name,
-                        user.last_name, user.other_names, user.phone_number,
-                         user.date_registered, user.is_admin)
-
-        self.cursor.execute(new_user)
-        inserted_user = self.get_user_by_email(user.email)
-        
-        return inserted_user
-
-    def get_user_by_id(self, user_id):
-        return self.get_user('id', user_id)
-
-    def get_user_by_email(self, login_email):
-        return self.get_user('email', login_email)
-
-    def get_user(self, key, value):
-        if key == 'id':
-            select_query = "SELECT * FROM users WHERE users.id = {};".format(value)
-        elif key == 'email':
-            select_query = "SELECT * FROM users WHERE users.email = '{}';".format(value)
-
-        self.cursor.execute(select_query)
-        user = self.cursor.fetchone()
-        # only return if ther is a user found
-        if not user is None:
-            return user
-
-    # def get_all(self):
-    #     return [user.to_dict() for user in user_table]
-
-    # # def delete_user(self, user_id):
-    # #     users = self.get_user(user_id)
-    # #     if len(users) > 0:
-    # #         user_table.remove(users[0])
-
-    # # def promote_user(self, user_id):
-    # #     users = self.get_user_by_id(user_id)
-    # #     if len(users) > 0:
-    # #         users[0].is_admin = True
-
-    # def count(self):
-    #     return len(user_table)
-
-    def remove_all(self):
-        delete_query = 'DELETE FROM users;'
-        self.cursor.execute(delete_query)
+    
         

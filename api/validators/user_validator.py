@@ -1,8 +1,9 @@
 import re
 from validate_email import validate_email
-from api.models.user_model import User, UserServices
+from api.models.user_model import User
+from api.models.db import DbConnection
 
-user_services = UserServices()
+user_services = DbConnection()
 
 
 class UserValidator():
@@ -112,11 +113,9 @@ class UserValidator():
         '''
         keys = ['email', 'password']
 
-        missing_data = [key for key in keys 
+        missing_data = [key for key in keys
                         if key not in data or len(data[key]) == 0]
-        if len(missing_data): 
+        if len(missing_data):
             return False
 
         return True
-    
-

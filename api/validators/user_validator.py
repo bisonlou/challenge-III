@@ -113,11 +113,9 @@ class UserValidator():
         '''
         keys = ['email', 'password']
 
-        missing_data = [key for key in keys 
+        missing_data = [key for key in keys
                         if key not in data or len(data[key]) == 0]
-        if len(missing_data): 
+        if len(missing_data):
             return False
 
         return True
-    
-

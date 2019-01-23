@@ -1,8 +1,5 @@
 from flask import json
 
-redflag_table = []
-intervention_table = []
-
 
 class Incident():
     statuses = ['Pending', 'Under investigation', 'Resolved', 'Rejected']
@@ -99,4 +96,3 @@ class Incident():
                     images=self._images,
                     videos=self._videos
                     )
-

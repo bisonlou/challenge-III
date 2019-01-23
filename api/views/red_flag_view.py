@@ -40,3 +40,33 @@ def get_incidents():
 def get_incident(incident_id):
 
     return incident_controller.get_incident(incident_type, incident_id)
+
+
+@app.route('/api/v1/incidents/<int:incident_id>', methods=['PUT'])
+@jwt_required
+def alter_red_flag(incident_id):
+
+    return incident_controller.put_incident(incident_id)
+
+
+@app.route('/api/v1/redflags/<int:incident_id>/location', methods=['PATCH'])
+@jwt_required
+def patch_red_flag_location(incident_id):
+
+    return incident_controller.patch_incident(incident_id,
+                                              incident_type, 'location')
+
+@app.route('/api/v1/redflags/<int:incident_id>/comment',
+           methods=['PATCH'])
+@jwt_required
+def patch_red_flag_comment(incident_id):
+
+    return incident_controller.patch_incident(incident_id, incident_type,
+                                              'comment')
+
+
+@app.route('/api/v1/incidents/<int:incident_id>', methods=['DELETE'])
+@jwt_required
+def delete_red_flag(incident_id):
+
+    return incident_controller.delete_incident(incident_type, incident_id)

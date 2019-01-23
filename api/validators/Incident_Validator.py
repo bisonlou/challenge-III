@@ -9,9 +9,9 @@ class ValidateIncident():
         Also checks if data is in required format
 
         '''
-        required_keys = ['created_on', 'title', 'comment', 'location', 'type']
+        required_keys = ['title', 'comment', 'location', 'type']
         list_values = ['images', 'videos']
-        string_values = ['title', 'comment', 'created_on', 'type']
+        string_values = ['title', 'comment', 'type']
 
         # get list of missing keys
         missing_keys = [key for key in required_keys if key not in data]

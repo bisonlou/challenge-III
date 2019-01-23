@@ -11,7 +11,7 @@ class TestUserView(unittest.TestCase):
         """
         Setup test client
         """
-        self.test_client = test_client   
+        self.test_client = test_client
         self.db_services = DbConnection()
 
         user = {

@@ -8,13 +8,13 @@ class DbConnection():
         self.db_name = 'ireporter'
 
         try:
-            # self.connection = psycopg2.connect(
-            #     dbname=self.db_name, user='postgres', host='localhost',
-            #     password='system#2008', port=5432
-            # )
             self.connection = psycopg2.connect(
-                dbname=self.db_name, user='postgres', password='',
-                 host='localhost')
+                dbname=self.db_name, user='postgres', host='localhost',
+                password='andela', port=5432
+            )
+            # self.connection = psycopg2.connect(
+            #     dbname=self.db_name, user='postgres', password='',
+            #      host='localhost')
 
             self.connection.autocommit = True
             self.cursor = self.connection.cursor(
@@ -24,7 +24,8 @@ class DbConnection():
                             CREATE TABLE IF NOT EXISTS public.users (id SERIAL
                              NOT NULL PRIMARY KEY, userName TEXT NOT NULL,
                                 email TEXT NOT NULL, password TEXT NOT NULL,
-                                 firstName TEXT NOT NULL, lastName TEXT NOT NULL,
+                                 firstName TEXT NOT NULL,
+                                 lastName TEXT NOT NULL,
                                 otherNames TEXT NOT NULL, phoneNumber TEXT NOT
                                  NULL, dteRegistered TEXT NOT NULL,
                                 isAdmin Boolean NOT NULL);
@@ -37,7 +38,7 @@ class DbConnection():
                                  (createdBy) REFERENCES users (id)
                                 ON UPDATE CASCADE ON DELETE CASCADE);
                             CREATE TABLE IF NOT EXISTS public.images(id SERIAL
-                             NOT NULL PRIMARY KEY, 
+                             NOT NULL PRIMARY KEY,
                                 incident INTEGER NOT NULL, filename
                                  VARCHAR(255) NOT NULL,
                                 FOREIGN KEY (incident) REFERENCES incidents(id)
@@ -56,9 +57,10 @@ class DbConnection():
 
     def add_user(self, user):
         new_user = "INSERT INTO users \
-                    (username, email, password, firstName,\
-                    lastName, otherNames, phoneNumber, dteRegistered, isAdmin)\
-                    VALUES('{}', '{}', '{}','{}', '{}', '{}','{}', '{}', '{}');".format(
+                    (username, email, password, firstName, lastName,\
+                     otherNames, phoneNumber, dteRegistered, isAdmin)\
+                    VALUES('{}', '{}', '{}','{}', '{}', '{}','{}', '{}', '{}')\
+                    ;".format(
             user.user_name, user.email, user.password, user.first_name,
             user.last_name, user.other_names, user.phone_number,
             user.date_registered, user.is_admin)
@@ -84,25 +86,9 @@ class DbConnection():
 
         self.cursor.execute(select_query)
         user = self.cursor.fetchone()
-        # only return if ther is a user found
+
         if user:
             return user
-
-    # def get_all(self):
-    #     return [user.to_dict() for user in user_table]
-
-    # # def delete_user(self, user_id):
-    # #     users = self.get_user(user_id)
-    # #     if len(users) > 0:
-    # #         user_table.remove(users[0])
-
-    # # def promote_user(self, user_id):
-    # #     users = self.get_user_by_id(user_id)
-    # #     if len(users) > 0:
-    # #         users[0].is_admin = True
-
-    # def count(self):
-    #     return len(user_table)
 
     def delete_all_users(self):
         delete_query = 'DELETE FROM users;'
@@ -112,7 +98,8 @@ class DbConnection():
         new_incident = "INSERT INTO incidents \
                     (createdOn, title, comment, type,\
                      createdBy, location, status) \
-                    VALUES('{}', '{}', '{}','{}', '{}', '{}','{}') RETURNING id;".format(
+                    VALUES('{}', '{}', '{}','{}', '{}', '{}','{}')\
+                    RETURNING id;".format(
             incident.created_on, incident.title, incident.comment,
             incident.incident_type, incident.created_by, incident.location,
             incident.status)
@@ -139,23 +126,24 @@ class DbConnection():
 
         return incident_id
 
-    def count(self, incident_type):
-        if incident_type == 'red-flag':
-            return len(redflag_table)
-        elif incident_type == 'intervention':
-            return len(intervention_table)
-
-    def get_all_incidents(self, user_id, is_admin, incident_type):
+    def get_all_incidents(self, user_id, incident_type):
         query = ""
         # check if user is admin
-        if is_admin is True:
-            incidents_query = "SELECT * FROM incidents WHERE \
-                    type = '{}'".format(incident_type)
+        if self.check_user_is_admin(user_id):
+            incidents_query = "select * from incidents inner join images \
+                             ON incidents.id = images.incident \
+                             INNER JOIN videos \
+                             ON incidents.id = videos.incident \
+                             WHERE incidents.type = '{}';\
+                            ".format(incident_type)
         else:
-            incidents_query = "SELECT * FROM incidents WHERE \
-                    type = '{}' AND createdby = {}".format(
-                incident_type, user_id
-            )
+            incidents_query = "select * from incidents inner join images \
+                             on incidents.id = images.incident \
+                             INNER JOIN videos \
+                             ON incidents.id = videos.incident \
+                             WHERE incidents.type = '{}' \
+                             AND incidents.createdby = {};".format(
+                incident_type, user_id)
 
         self.cursor.execute(incidents_query)
         returned_incidents = self.cursor.fetchall()
@@ -166,37 +154,80 @@ class DbConnection():
         delete_query = 'DELETE FROM incidents;'
         self.cursor.execute(delete_query)
 
-    def get_incident(self, user_id, incident_id, incident_type):
+    def get_incident(self, user_id, incident_id):
+        '''
+        Function to get just one incident
+        Requires a user id to check user type
+        Returns a uder dictionary
+        '''
         incidents_query = ""
 
         if self.check_user_is_admin(user_id):
-            incidents_query = "SELECT * FROM incidents WHERE \
-                            type = '{}' AND id = {}\
-                            ".format(incident_type, incident_id)
+            incidents_query = "select * from incidents \
+                             WHERE incidents.id = {};\
+                            ".format(incident_id)
         else:
-            incidents_query = "SELECT * FROM incidents WHERE \
-                            type = '{}' AND id = {} AND createdby = {}\
-                            ".format(incident_type, incident_id, user_id)
+            incidents_query = "select * from incidents \
+                            WHERE incidents.id = {} \
+                            AND incidents.createdby = {};".format(
+                incident_id, user_id)
 
         self.cursor.execute(incidents_query)
         incident = self.cursor.fetchone()
 
         return incident
 
-    def put_incident(self, existing_incident, update_incident, incident_type):
-        keys = ['title', 'location', 'images', 'videos', 'created_on',
-                'comment', 'status']
-        for key in keys:
-            self.patch_incident(existing_incident, update_incident, key)
+    def put_incident(self, update_incident):
+        update_query = "UPDATE incidents SET title = '{}', location = '{}', comment = '{}'  WHERE id = {} AND createdby = {} RETURNING id".format(
+            update_incident.title,
+            update_incident.location,
+            update_incident.comment,
+            update_incident.id,
+            update_incident.created_by)
 
-    def patch_incident(self, existing_incident, update_incident, key):
-        setattr(existing_incident, key, getattr(update_incident, key))
+        self.cursor.execute(update_query)
+        returned_data = self.cursor.fetchone()
 
-    def delete_incident(self, incident, incident_type):
-        if incident_type == 'red-flag':
-            redflag_table.remove(incident)
-        elif incident_type == 'intervention':
-            intervention_table.remove(incident)
+        incident_id = returned_data['id']
+        updated_incident = self.get_incident(update_incident.created_by,
+                                             incident_id)
+
+        return updated_incident
+
+    def patch_incident(self, update_incident, update_key):
+        update_query = "UPDATE incidents SET {} = '{}' WHERE id = {} and createdby = {} RETURNING id".format(
+            update_key,
+            getattr(update_incident, update_key),
+            update_incident.id,
+            update_incident.created_by)
+
+        self.cursor.execute(update_query)
+        returned_data = self.cursor.fetchone()
+
+        incident_id = returned_data['id']
+        updated_incident = self.get_incident(update_incident.created_by,
+                                             incident_id)
+
+        return updated_incident
+
+    def delete_incident(self, incident_id):
+        delete_incidents_query = "DELETE FROM incidents WHERE id = {} RETURNING id".format(
+                                 incident_id)
+
+        delete_images_query = "DELETE FROM images WHERE id = {} RETURNING id".format(
+            incident_id)
+
+        delete_videos_query = "DELETE FROM videos WHERE id = {} RETURNING id".format(
+            incident_id)
+
+        self.cursor.execute(delete_images_query)
+        self.cursor.execute(delete_videos_query)
+        returned_data = self.cursor.fetchone()
+
+        if returned_data:
+            deleted_id = returned_data['id']
+
+            return deleted_id
 
     def escalate_incident(self, incident):
         # get current status
@@ -218,4 +249,27 @@ class DbConnection():
         self.cursor.execute(query)
         query_result = self.cursor.fetchone()
 
-        return query_result
+        if query_result:
+            return query_result['isadmin']
+
+    def get_incident_images(self, incident_id):
+        '''
+        Function to fetch an incidents images
+        '''
+        images_query = "select filename from images \
+                            WHERE incident = {};\
+                            ".format(incident_id)
+        images = self.cursor.execute(images_query)
+        if images:
+            return images
+
+    def get_incident_videos(self, incident_id):
+        '''
+        Function to fetch an incidents videos
+        '''
+        videos_query = "select filename from videos \
+                            WHERE incident = {};\
+                            ".format(incident_id)
+        videos = self.cursor.execute(videos_query)
+        if videos:
+            return videos

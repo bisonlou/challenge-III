@@ -78,9 +78,8 @@ class TestRedFlagView(unittest.TestCase):
             'comment': 'Police officer at CPS Badge #162',
             'location': '(-65.712557, -15.000182)',
             'type': 'red-flag',
-            'images': [{'id': 1, 'name': 'photo_0979.jpg', 'size': 234},
-                       {'id': 2, 'name': 'photo_0094.jpg', 'size': 200}],
-            'videos': [{'id': 1, 'name': 'video_0002.mov', 'size': 2340}]
+            'images': ['photo_0979.jpg', 'photo_0094.jpg'],
+            'videos': ['video_0002.mov']
         }
 
         red_flag_2 = {
@@ -89,8 +88,8 @@ class TestRedFlagView(unittest.TestCase):
             'comment': 'Police officer at CPS Badge #162',
             'location': '(-65.712557, -15.000182)',
             'type': 'red-flag',
-            'images': [{'id': 1, 'name': 'photo_0979.jpg', 'size': 234}],
-            'videos': [{'id': 1, 'name': 'video_0002.mov', 'size': 2340}]
+            'images': ['photo_0979.jpg'],
+            'videos': ['video_0002.mov']
         }
 
         self.test_client.post(
@@ -127,8 +126,8 @@ class TestRedFlagView(unittest.TestCase):
             'comment': 'Police officer at CPS Badge #162',
             'location': '(-65.712557, -15.000182)',
             'type': 'red-flag',
-            'images': [{'id': 1, 'name': 'photo_0912.jpg', 'size': 134}],
-            'videos': [{'id': 1, 'name': 'video_0102.mov', 'size': 2220}]
+            'images': ['photo_0912.jpg'],
+            'videos': ['video_0102.mov']
         }
 
         response = self.test_client.post(
@@ -176,7 +175,7 @@ class TestRedFlagView(unittest.TestCase):
         2 red flag expected
         """
         response = self.test_client.get(
-            '/api/v1/incidents/red-flag',
+            '/api/v1/redflags',
             headers={'Authorization': 'Bearer ' +
                      self.admin_token['data'][0]['access_token']})
         message = json.loads(response.data)

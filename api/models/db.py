@@ -11,9 +11,6 @@ class DbConnection():
         try:
 
             self.connection = psycopg2.connect(environ.get('URI'))
-            self.connection = psycopg2.connect(
-                dbname=self.db_name, user='postgres', password='', host='localhost')
-
 
             self.connection.autocommit = True
             self.cursor = self.connection.cursor(

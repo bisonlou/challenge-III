@@ -1,3 +1,4 @@
+from os import environ
 import psycopg2
 import psycopg2.extras
 
@@ -8,13 +9,8 @@ class DbConnection():
         self.db_name = 'ireporter'
 
         try:
-            # self.connection = psycopg2.connect(
-            #     dbname=self.db_name, user='postgres', host='localhost',
-            #     password='andela', port=5432
-            # )
-            self.connection = psycopg2.connect(
-                dbname=self.db_name, user='postgres', password='', host='localhost')
-
+            self.connection = psycopg2.connect(environ.get('URI'))
+            
             self.connection.autocommit = True
             self.cursor = self.connection.cursor(
                 cursor_factory=psycopg2.extras.RealDictCursor)

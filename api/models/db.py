@@ -13,31 +13,44 @@ class DbConnection():
             #     password='system#2008', port=5432
             # )
             self.connection = psycopg2.connect(
-                dbname=self.db_name, user='postgres', password='')
+                dbname=self.db_name, user='postgres', password='', host='localhost')
 
             self.connection.autocommit = True
             self.cursor = self.connection.cursor(
                 cursor_factory=psycopg2.extras.RealDictCursor)
 
             create_tables = '''
-                            CREATE TABLE IF NOT EXISTS public.users (id SERIAL NOT NULL PRIMARY KEY, userName TEXT NOT NULL,
-                                email TEXT NOT NULL, password TEXT NOT NULL, firstName TEXT NOT NULL, lastName TEXT NOT NULL,
-                                otherNames TEXT NOT NULL, phoneNumber TEXT NOT NULL, dteRegistered TEXT NOT NULL,
+                            CREATE TABLE IF NOT EXISTS public.users (id SERIAL
+                             NOT NULL PRIMARY KEY, userName TEXT NOT NULL,
+                                email TEXT NOT NULL, password TEXT NOT NULL,
+                                 firstName TEXT NOT NULL, lastName TEXT NOT NULL,
+                                otherNames TEXT NOT NULL, phoneNumber TEXT NOT
+                                 NULL, dteRegistered TEXT NOT NULL,
                                 isAdmin Boolean NOT NULL);
-                            CREATE TABLE IF NOT EXISTS incidents(id SERIAL NOT NULL PRIMARY KEY, createdOn TIMESTAMP,
+                            CREATE TABLE IF NOT EXISTS incidents(id SERIAL NOT
+                                 NULL PRIMARY KEY, createdOn TIMESTAMP,
                                 title TEXT NOT NULL, comment TEXT NOT NULL,
-                                type varchar(25), createdBy INTEGER, location VARCHAR(50) NOT NULL,
-                                status varchar(20) NOT NULL, FOREIGN KEY (createdBy) REFERENCES users (id)
+                                type varchar(25), createdBy INTEGER, location
+                                 VARCHAR(50) NOT NULL,
+                                status varchar(20) NOT NULL, FOREIGN KEY
+                                 (createdBy) REFERENCES users (id)
                                 ON UPDATE CASCADE ON DELETE CASCADE);
-                            CREATE TABLE IF NOT EXISTS public.images(id SERIAL NOT NULL PRIMARY KEY, 
-                                incident INTEGER, filename CHARACTER VARCHAR(255) NOT NULL,
-                                FOREIGN KEY (incident) REFERENCES incidents(id) ON UPDATE CASCADE ON DELETE CASCADE);
-                            CREATE TABLE IF NOT EXISTS videos( id INTEGER, incident INTEGER, filename VARCHAR(255) NOT NULL,
-                                FOREIGN KEY (incident) REFERENCES incidents (id) ON UPDATE CASCADE ON DELETE CASCADE 
-                            ); 
+                            CREATE TABLE IF NOT EXISTS public.images(id SERIAL
+                             NOT NULL PRIMARY KEY, 
+                                incident INTEGER NOT NULL, filename
+                                 VARCHAR(255) NOT NULL,
+                                FOREIGN KEY (incident) REFERENCES incidents(id)
+                                 ON UPDATE CASCADE ON DELETE CASCADE);
+                            CREATE TABLE IF NOT EXISTS videos( id SERIAL
+                             NOT NULL PRIMARY KEY, incident INTEGER NOT NULL,
+                              filename VARCHAR(255) NOT NULL,
+                                FOREIGN KEY (incident) REFERENCES incidents
+                                 (id) ON UPDATE CASCADE ON DELETE CASCADE
+                            );
                         '''
             self.cursor.execute(create_tables)
-        except:
+        except Exception as e:
+            print(e)
             print('Failed to connect to the database.')
 
     def add_user(self, user):
@@ -98,12 +111,32 @@ class DbConnection():
         new_incident = "INSERT INTO incidents \
                     (createdOn, title, comment, type,\
                      createdBy, location, status) \
-                    VALUES('{}', '{}', '{}','{}', '{}', '{}','{}');".format(
+                    VALUES('{}', '{}', '{}','{}', '{}', '{}','{}') RETURNING id;".format(
             incident.created_on, incident.title, incident.comment,
             incident.incident_type, incident.created_by, incident.location,
             incident.status)
 
         self.cursor.execute(new_incident)
+        result = self.cursor.fetchone()
+        incident_id = result['id']
+
+        images = incident.images
+        for image in images:
+            new_incident_image = "INSERT INTO images \
+                            (incident, filename) values \
+                            ({}, '{}');".format(incident_id, image)
+
+            self.cursor.execute(new_incident_image)
+
+        videos = incident.videos
+        for video in videos:
+            new_incident_video = "INSERT INTO videos \
+                            (incident, filename) values \
+                            ({}, '{}');".format(incident_id, video)
+
+            self.cursor.execute(new_incident_video)
+
+        return incident_id
 
     def count(self, incident_type):
         if incident_type == 'red-flag':
@@ -120,8 +153,8 @@ class DbConnection():
         else:
             incidents_query = "SELECT * FROM incidents WHERE \
                     type = '{}' AND createdby = {}".format(
-                    incident_type, user_id
-                    )
+                incident_type, user_id
+            )
 
         self.cursor.execute(incidents_query)
         returned_incidents = self.cursor.fetchall()
@@ -132,18 +165,22 @@ class DbConnection():
         delete_query = 'DELETE FROM incidents;'
         self.cursor.execute(delete_query)
 
-    def get_incident(self, incident_id, incident_type):
-        # covert flag item to dictionaties
-        incidents = []
-        if incident_type == 'red-flag':
-            incidents = [incident for incident in
-                         redflag_table if incident.id == incident_id]
-        elif incident_type == 'intervention':
-            incidents = [incident for incident in
-                         intervention_table if incident.id == incident_id]
+    def get_incident(self, user_id, incident_id, incident_type):
+        incidents_query = ""
 
-        if len(incidents) > 0:
-            return incidents[0]
+        if self.check_user_is_admin(user_id):
+            incidents_query = "SELECT * FROM incidents WHERE \
+                            type = '{}' AND id = {}\
+                            ".format(incident_type, incident_id)
+        else:
+            incidents_query = "SELECT * FROM incidents WHERE \
+                            type = '{}' AND id = {} AND createdby = {}\
+                            ".format(incident_type, incident_id, user_id)
+
+        self.cursor.execute(incidents_query)
+        incident = self.cursor.fetchone()
+
+        return incident
 
     def put_incident(self, existing_incident, update_incident, incident_type):
         keys = ['title', 'location', 'images', 'videos', 'created_on',
@@ -174,3 +211,10 @@ class DbConnection():
     def reject(self, incident):
         # set status to -1 to match last item in status list
         incident.status = -1
+
+    def check_user_is_admin(self, user_id):
+        query = "SELECT isadmin from users WHERE id = {}".format(user_id)
+        self.cursor.execute(query)
+        query_result = self.cursor.fetchone()
+
+        return query_result

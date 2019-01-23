@@ -27,8 +27,16 @@ def create_incident():
     return incident_controller.create_incident()
 
 
-@app.route('/api/v1/incidents/<string:incident_type>', methods=['GET'])
+@app.route('/api/v1/redflags', methods=['GET'])
 @jwt_required
-def get_incidents(incident_type):
+def get_incidents():
 
     return incident_controller.get_incidents(incident_type)
+
+
+@app.route('/api/v1/redflags/<int:incident_id>',
+           methods=['GET'])
+@jwt_required
+def get_incident(incident_id):
+
+    return incident_controller.get_incident(incident_type, incident_id)

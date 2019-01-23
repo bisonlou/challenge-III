@@ -183,18 +183,44 @@ class TestRedFlagView(unittest.TestCase):
 
         self.assertEqual(response.status_code, 200)
 
-    # def test_get_all_redflags_as_non_admin(self):
+    # def test_get_existing_red_flag(self):
     #     """
-    #     Test getting all red flags when user is not admin
+    #     Test getting one red flag that exists
+    #     Expect 200
     #     """
     #     response = self.test_client.get(
-    #         '/api/v1/incidents/red-flag',
+    #         '/api/v1/redflags/1',
     #         headers={'Authorization': 'Bearer ' +
-    #                  self.non_admin_token['access_token']})
+    #                  self.admin_token['data'][0]['access_token']})
     #     message = json.loads(response.data)
 
     #     self.assertEqual(message['status'], 200)
-    #     self.assertEqual(len(message['data']), 1)
-    #     self.assertEqual(response.status_code, 200)
+
+    # def test_get_red_flag_when_not_owner(self):
+    #     """
+    #     Test getting one red flag that does not belong to the user
+    #     Expect 403
+    #     """
+    #     response = self.test_client.get(
+    #         '/api/v1/redflags/1',
+    #         headers={'Authorization': 'Bearer ' +
+    #                  self.admin_token['data'][0]['access_token']})
+    #     message = json.loads(response.data)
+
+    #     self.assertEqual(message['status'], 403)
+
+    # def test_get_non_existent_red_flag(self):
+    #     """
+    #     Test getting one red flag that does not exist
+    #     Expect 404
+    #     """
+    #     response = self.test_client.get(
+    #         '/api/v1/redflags/3',
+    #         headers={'Authorization': 'Bearer ' +
+    #                  self.admin_token['data'][0]['access_token']})
+    #     message = json.loads(response.data)
+
+    #     self.assertEqual(message['status'], 404)
+
 
     

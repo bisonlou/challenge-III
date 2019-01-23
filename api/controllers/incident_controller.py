@@ -60,3 +60,20 @@ class IncidentController():
                     )
 
         return jsonify({'status': 200, 'data': [incidents]})
+
+    def get_incident(self, incident_type, incident_id):
+        '''
+        Function to retun an incident give an incident id
+        Validates the incident exists and belongs to this user
+        If validation is passed an incident is returned
+
+        '''
+        user_id = get_jwt_identity()
+        incident = db_services.get_incident(
+                                user_id, incident_id,
+                                incident_type)
+        if not incident:
+            abort(404)
+
+        return jsonify({'status': 200, 'data': [incident]}), 200
+

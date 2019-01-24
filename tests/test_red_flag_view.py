@@ -21,17 +21,6 @@ class TestRedFlagView(unittest.TestCase):
             'phone_number': '0753669897',
             'password': 'Pa$$word123',
             'other_names': 'innocent',
-            'is_admin': True
-        }
-
-        user_2 = {
-            'user_name': 'bison',
-            'email': 'bisonlou@liverpool.com',
-            'first_name': 'bison',
-            'last_name': 'lou',
-            'phone_number': '0753669897',
-            'password': 'Pa$$word123',
-            'other_names': 'innocent',
             'is_admin': False
         }
 
@@ -41,19 +30,8 @@ class TestRedFlagView(unittest.TestCase):
             data=json.dumps(user_1)
         )
 
-        self.test_client.post(
-            '/api/v1/auth/signup',
-            content_type='application/json',
-            data=json.dumps(user_2)
-        )
-
         user1_login = {
             'email': 'bisonlou@aon.com',
-            'password': 'Pa$$word123'
-        }
-
-        user2_login = {
-            'email': 'bisonlou@liverpool.com',
             'password': 'Pa$$word123'
         }
 
@@ -63,14 +41,7 @@ class TestRedFlagView(unittest.TestCase):
             data=json.dumps(user1_login)
         )
 
-        response_2 = self.test_client.post(
-            '/api/v1/auth/login',
-            content_type='application/json',
-            data=json.dumps(user2_login)
-        )
-
-        self.admin_token = json.loads(response_1.data)
-        self.non_admin_token = json.loads(response_2.data)
+        self.non_admin_token = json.loads(response_1.data)
 
         red_flag_1 = {
             'created_on': '2018-12-24',
@@ -82,30 +53,12 @@ class TestRedFlagView(unittest.TestCase):
             'videos': ['video_0002.mov']
         }
 
-        red_flag_2 = {
-            'created_on': '2018-12-12',
-            'title': 'Magistrate',
-            'comment': 'Police officer at CPS Badge #162',
-            'location': '(-65.712557, -15.000182)',
-            'type': 'red-flag',
-            'images': ['photo_0979.jpg'],
-            'videos': ['video_0002.mov']
-        }
-
         self.test_client.post(
             '/api/v1/incidents',
             headers={'Authorization': 'Bearer ' +
                      self.non_admin_token['data'][0]['access_token']},
             content_type='application/json',
             data=json.dumps(red_flag_1)
-        )
-
-        self.test_client.post(
-            '/api/v1/incidents',
-            headers={'Authorization': 'Bearer ' +
-                     self.non_admin_token['data'][0]['access_token']},
-            content_type='application/json',
-            data=json.dumps(red_flag_2)
         )
 
     def tearDown(self):
@@ -177,8 +130,8 @@ class TestRedFlagView(unittest.TestCase):
         response = self.test_client.get(
             '/api/v1/redflags',
             headers={'Authorization': 'Bearer ' +
-                     self.admin_token['data'][0]['access_token']})
+                     self.non_admin_token['data'][0]['access_token']})
         message = json.loads(response.data)
 
         self.assertEqual(response.status_code, 200)
-   
+

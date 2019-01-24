@@ -1,7 +1,7 @@
 from datetime import datetime
-from api import app, jwt
+from api import app
 from flask import Flask, request, json, jsonify, abort
-from flask_jwt_extended import get_jwt_identity
+from api.utility.authenticator import get_identity
 from api.validators.Incident_Validator import ValidateIncident
 from api.models.incident_model import Incident
 from api.models.user_model import User
@@ -14,9 +14,7 @@ db_services = DbConnection()
 
 class IncidentController():
     '''
-
     Class to handle incident related routes
-
     '''
 
     def create_incident(self):
@@ -27,14 +25,15 @@ class IncidentController():
 
         '''
         incident_body = request.get_json()
-        user_id = get_jwt_identity()
+        user_id = get_identity()
 
         incident_body['created_by'] = user_id
         incident_body['status'] = 'Pending'
         incident_body['created_on'] = datetime.utcnow().date()
 
-        if not incident_validator.has_required_keys(incident_body):
-            abort(400)
+        errors = incident_validator.has_required_keys(incident_body)
+        if errors:
+            return jsonify({'status': 400, 'errors': errors}), 400
 
         incident_type = incident_body['type']
 
@@ -51,13 +50,11 @@ class IncidentController():
     def get_incidents(self, incident_type):
         '''
         Function to retun all incident given an incident id
-
         '''
-        user_id = get_jwt_identity()
+        user_id = get_identity()
 
         incidents = db_services.get_all_incidents(
-            user_id, incident_type
-        )
+                    user_id, incident_type)
 
         return jsonify({'status': 200, 'data': [incidents]})
 
@@ -68,12 +65,13 @@ class IncidentController():
         If validation is passed an incident is returned
 
         '''
-        user_id = get_jwt_identity()
+        user_id = get_identity()
         incident = db_services.get_incident(
             user_id, incident_id)
 
         if not incident:
-            abort(404)
+            return jsonify({'status': 404, 'errors':
+                            'Incident does not exist'}), 404
 
         return jsonify({'status': 200, 'data': [incident]}), 200
 
@@ -86,19 +84,25 @@ class IncidentController():
 
         '''
         data = request.get_json()
-        user_id = get_jwt_identity()
+        user_id = get_identity()
 
         data['created_by'] = user_id
         data['id'] = incident_id
 
-        if not incident_validator.has_required_keys(data):
-            abort(400)
+        errors = incident_validator.has_required_keys(data)
+        if errors:
+            return jsonify({'status': 400, 'errors': errors}), 400
+
+        current_incident = db_services.get_incident(user_id, incident_id)
+        if current_incident is None:
+            return jsonify({'status': 404, 'errors':
+                            'incident not found'}), 404
 
         update_incident = Incident(**data)
 
         updated_incident = db_services.put_incident(update_incident)
-        return jsonify(
-            {
+
+        return jsonify({
                 'status': 200,
                 'data': [updated_incident]
             })
@@ -112,24 +116,36 @@ class IncidentController():
 
         '''
         data = request.get_json()
-        user_id = get_jwt_identity()
+        user_id = get_identity()
 
         data['created_by'] = user_id
         data['id'] = incident_id
 
-        if not incident_validator.has_required_keys(data):
-            abort(400)
+        errors = incident_validator.has_required_keys(data)
+        if errors:
+            return jsonify({'status': 400, 'errors': errors}), 400
 
         existing_incident = db_services.get_incident(
                             user_id, incident_id)
+
         if not existing_incident:
-            abort(404)
+            return jsonify({'status': 404, 'errors':
+                            'incident not found'}), 404
+
+        if not incident_validator.is_modifiable(existing_incident):
+            return jsonify({'status': 403, 'error':
+                            'Incident no longer modifiable'}), 403
 
         update_incident = Incident(**data)
 
         incident = db_services.patch_incident(
                                     update_incident,
+                                    incident_type,
                                     update_key)
+        if incident is None:
+            return jsonify({'status': 401, 'data':
+                            '{} not found'.format(incident_type)}), 200
+
         success_response = {
             'id': incident_id,
             'message':
@@ -147,19 +163,24 @@ class IncidentController():
         and a success message is returned
 
         '''
-        user_id = get_jwt_identity()
+        user_id = get_identity()
 
         user = db_services.get_user_by_id(user_id)
         if not user:
-            abort(401)
+            return jsonify({'status': 401, 'errors':
+                            'You are not authenticated'}), 401
 
         existing_incident = db_services.get_incident(
                             user_id,
                             incident_id)
-        if not existing_incident:
-            abort(404)
+        if existing_incident is None:
+            return jsonify({'status': 404, 'error':
+                            'Incident doesnt exist'}), 404
 
         deleted_id = db_services.delete_incident(existing_incident['id'])
+        if deleted_id is None:
+            return jsonify({'status': 404, 'error':
+                            'Incident doesnt exist'}), 404
 
         success_response = {
             'id': deleted_id,

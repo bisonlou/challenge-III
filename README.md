@@ -5,7 +5,7 @@
 
 Installation
 ------------
-To access the api, browse to https://bisonlou.herokuapp.com/ using postman
+To access the api, browse to https://knightedge.herokuapp.com/ using postman
 
 Technology
 -------------

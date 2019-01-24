@@ -139,7 +139,7 @@ class DbConnection():
                              ON incidents.id = videos.incident \
                              WHERE incidents.type = '{}' \
                              AND incidents.createdby = {};".format(
-                incident_type, user_id)
+                             incident_type, user_id)
 
         self.cursor.execute(incidents_query)
         returned_incidents = self.cursor.fetchall()
@@ -170,8 +170,8 @@ class DbConnection():
 
         self.cursor.execute(incidents_query)
         incident = self.cursor.fetchone()
-
-        return incident
+        if incident:
+            return incident
 
     def put_incident(self, update_incident):
         update_query = "UPDATE incidents SET title = '{}', location = '{}', comment = '{}'  WHERE id = {} AND createdby = {} RETURNING id".format(
@@ -184,40 +184,41 @@ class DbConnection():
         self.cursor.execute(update_query)
         returned_data = self.cursor.fetchone()
 
-        incident_id = returned_data['id']
-        updated_incident = self.get_incident(update_incident.created_by,
-                                             incident_id)
+        if returned_data:
+            incident_id = returned_data['id']
 
-        return updated_incident
+            updated_incident = self.get_incident(update_incident.created_by,
+                                                 incident_id)
+            return updated_incident
 
-    def patch_incident(self, update_incident, update_key):
-        update_query = "UPDATE incidents SET {} = '{}' WHERE id = {} and createdby = {} RETURNING id".format(
-            update_key,
-            getattr(update_incident, update_key),
-            update_incident.id,
-            update_incident.created_by)
+    def patch_incident(self, update_incident, incident_type, update_key):
+        """
+        Updates an incident field
+        Returns the updataed incident"
+        """
+        update_query = "UPDATE incidents SET {} = '{}' WHERE id = {} and \
+                        type = '{}' AND createdby = {} RETURNING id".format(
+                                    update_key,
+                                    getattr(update_incident, update_key),
+                                    update_incident.id,
+                                    incident_type,
+                                    update_incident.created_by)
 
         self.cursor.execute(update_query)
         returned_data = self.cursor.fetchone()
 
-        incident_id = returned_data['id']
-        updated_incident = self.get_incident(update_incident.created_by,
-                                             incident_id)
+        if returned_data:
+            incident_id = returned_data['id']
+            updated_incident = self.get_incident(update_incident.created_by,
+                                                 incident_id)
 
-        return updated_incident
+            return updated_incident
 
     def delete_incident(self, incident_id):
         delete_incidents_query = "DELETE FROM incidents WHERE id = {} RETURNING id".format(
                                  incident_id)
 
-        delete_images_query = "DELETE FROM images WHERE id = {} RETURNING id".format(
-            incident_id)
-
-        delete_videos_query = "DELETE FROM videos WHERE id = {} RETURNING id".format(
-            incident_id)
-
-        self.cursor.execute(delete_images_query)
-        self.cursor.execute(delete_videos_query)
+        self.cursor.execute(delete_incidents_query)
         returned_data = self.cursor.fetchone()
 
         if returned_data:
@@ -235,10 +236,6 @@ class DbConnection():
 
         # set new status
         incident.status = status
-
-    def reject(self, incident):
-        # set status to -1 to match last item in status list
-        incident.status = -1
 
     def check_user_is_admin(self, user_id):
         query = "SELECT isadmin from users WHERE id = {}".format(user_id)

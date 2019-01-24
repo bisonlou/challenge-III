@@ -236,10 +236,6 @@ class DbConnection():
         # set new status
         incident.status = status
 
-    def reject(self, incident):
-        # set status to -1 to match last item in status list
-        incident.status = -1
-
     def check_user_is_admin(self, user_id):
         query = "SELECT isadmin from users WHERE id = {}".format(user_id)
         self.cursor.execute(query)

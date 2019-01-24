@@ -15,24 +15,24 @@ class TestRedFlagView(unittest.TestCase):
 
         user_1 = {
             'user_name': 'bison',
-            'email': 'bisonlou@aol.com',
-            'date_registered': '2019-01-01',
+            'email': 'bisonlou@aon.com',
             'first_name': 'bison',
             'last_name': 'lou',
             'phone_number': '0753669897',
             'password': 'Pa$$word123',
-            'other_names': ''
+            'other_names': 'innocent',
+            'is_admin': True
         }
 
         user_2 = {
             'user_name': 'bison',
-            'email': 'bisonlou@yahoo.com',
-            'date_registered': '2019-01-01',
+            'email': 'bisonlou@liverpool.com',
             'first_name': 'bison',
             'last_name': 'lou',
             'phone_number': '0753669897',
             'password': 'Pa$$word123',
-            'other_names': ''
+            'other_names': 'innocent',
+            'is_admin': False
         }
 
         self.test_client.post(
@@ -48,12 +48,12 @@ class TestRedFlagView(unittest.TestCase):
         )
 
         user1_login = {
-            'email': 'bisonlou@aol.com',
+            'email': 'bisonlou@aon.com',
             'password': 'Pa$$word123'
         }
 
         user2_login = {
-            'email': 'bisonlou@yahoo.com',
+            'email': 'bisonlou@liverpool.com',
             'password': 'Pa$$word123'
         }
 
@@ -95,7 +95,7 @@ class TestRedFlagView(unittest.TestCase):
         self.test_client.post(
             '/api/v1/incidents',
             headers={'Authorization': 'Bearer ' +
-                     self.admin_token['data'][0]['access_token']},
+                     self.non_admin_token['data'][0]['access_token']},
             content_type='application/json',
             data=json.dumps(red_flag_1)
         )
@@ -133,12 +133,12 @@ class TestRedFlagView(unittest.TestCase):
         response = self.test_client.post(
             '/api/v1/incidents',
             headers={'Authorization': 'Bearer ' +
-                     self.admin_token['data'][0]['access_token']},
+                     self.non_admin_token['data'][0]['access_token']},
             content_type='application/json',
             data=json.dumps(red_flag)
         )
-        print(self.admin_token['data'][0]['access_token'])
         message = json.loads(response.data)
+
         self.assertEqual(message['status'], 201)
 
     def test_add_bad_red_flag(self):
@@ -160,7 +160,7 @@ class TestRedFlagView(unittest.TestCase):
         response = self.test_client.post(
             '/api/v1/incidents',
             headers={'Authorization': 'Bearer ' +
-                     self.admin_token['data'][0]['access_token']},
+                     self.non_admin_token['data'][0]['access_token']},
             content_type='application/json',
             data=json.dumps(red_flag)
         )
@@ -181,45 +181,4 @@ class TestRedFlagView(unittest.TestCase):
         message = json.loads(response.data)
 
         self.assertEqual(response.status_code, 200)
-
-    # def test_get_existing_red_flag(self):
-    #     """
-    #     Test getting one red flag that exists
-    #     Expect 200
-    #     """
-    #     response = self.test_client.get(
-    #         '/api/v1/redflags/1',
-    #         headers={'Authorization': 'Bearer ' +
-    #                  self.admin_token['data'][0]['access_token']})
-    #     message = json.loads(response.data)
-
-    #     self.assertEqual(message['status'], 200)
-
-    # def test_get_red_flag_when_not_owner(self):
-    #     """
-    #     Test getting one red flag that does not belong to the user
-    #     Expect 403
-    #     """
-    #     response = self.test_client.get(
-    #         '/api/v1/redflags/1',
-    #         headers={'Authorization': 'Bearer ' +
-    #                  self.admin_token['data'][0]['access_token']})
-    #     message = json.loads(response.data)
-
-    #     self.assertEqual(message['status'], 403)
-
-    # def test_get_non_existent_red_flag(self):
-    #     """
-    #     Test getting one red flag that does not exist
-    #     Expect 404
-    #     """
-    #     response = self.test_client.get(
-    #         '/api/v1/redflags/3',
-    #         headers={'Authorization': 'Bearer ' +
-    #                  self.admin_token['data'][0]['access_token']})
-    #     message = json.loads(response.data)
-
-    #     self.assertEqual(message['status'], 404)
-
-
-    
+   

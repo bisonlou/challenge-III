@@ -21,7 +21,8 @@ class TestUserView(unittest.TestCase):
             'last_name': 'lou',
             'phone_number': '0753669897',
             'password': 'Pa$$word123',
-            'other_names': 'innocent'
+            'other_names': 'innocent',
+            'is_admin': True
         }
 
         response = self.test_client.post(
@@ -119,7 +120,7 @@ class TestUserView(unittest.TestCase):
         Test login with wrong email
         """
         user = {
-            'email': 'bisonlou@outlook.com',
+            'email': 'bisonlou@abc.com',
             'password': 'Pa$$word123'
         }
 

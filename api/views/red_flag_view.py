@@ -1,7 +1,8 @@
-from api import app, jwt
-from api.controllers.incident_controller import IncidentController
 from flask import request, jsonify
-from flask_jwt_extended import jwt_required
+from api import app
+from api.controllers.incident_controller import IncidentController
+from api.utility.authenticator import (jwt_required, admin_denied,
+json_data_required)
 
 
 incident_controller = IncidentController()
@@ -23,6 +24,8 @@ def index():
 
 @app.route('/api/v1/incidents', methods=['POST'])
 @jwt_required
+@admin_denied
+@json_data_required
 def create_incident():
     return incident_controller.create_incident()
 
@@ -44,6 +47,8 @@ def get_incident(incident_id):
 
 @app.route('/api/v1/incidents/<int:incident_id>', methods=['PUT'])
 @jwt_required
+@admin_denied
+@json_data_required
 def alter_red_flag(incident_id):
 
     return incident_controller.put_incident(incident_id)
@@ -51,6 +56,8 @@ def alter_red_flag(incident_id):
 
 @app.route('/api/v1/redflags/<int:incident_id>/location', methods=['PATCH'])
 @jwt_required
+@admin_denied
+@json_data_required
 def patch_red_flag_location(incident_id):
 
     return incident_controller.patch_incident(incident_id,
@@ -59,6 +66,8 @@ def patch_red_flag_location(incident_id):
 @app.route('/api/v1/redflags/<int:incident_id>/comment',
            methods=['PATCH'])
 @jwt_required
+@admin_denied
+@json_data_required
 def patch_red_flag_comment(incident_id):
 
     return incident_controller.patch_incident(incident_id, incident_type,
@@ -67,6 +76,8 @@ def patch_red_flag_comment(incident_id):
 
 @app.route('/api/v1/incidents/<int:incident_id>', methods=['DELETE'])
 @jwt_required
+@admin_denied
+@json_data_required
 def delete_red_flag(incident_id):
 
     return incident_controller.delete_incident(incident_type, incident_id)

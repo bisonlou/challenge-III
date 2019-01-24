@@ -1,11 +1,11 @@
 from datetime import datetime
-from api import app, jwt
+from api import app
 from api.models.user_model import User
 from api.models.db import DbConnection
 from api.validators.user_validator import UserValidator
+from api.utility.authenticator import create_access_token
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask import jsonify, abort, request
-from flask_jwt_extended import create_access_token, get_jwt_identity
 
 validator = UserValidator()
 db_services = DbConnection()
@@ -23,49 +23,48 @@ class UserController():
         '''
         data = request.get_json()
 
-        if not validator.has_required_fields(data):
-            abort(400)
+        errors = validator.has_required_fields(data)
+        if errors:
+            return jsonify({'status': 400, 'errors': errors}), 400
 
-        errors = validator.get_password_errors(data)
-        if len(errors) > 0:
-            return jsonify({'status': 400, 'data': errors}), 400
-
-        if validator.duplicate_email(data['email']):
-            abort(409)
+        if validator.Check_for_duplicate_email(data['email']):
+            return jsonify({'status': 409, 'errors':
+                            'Conflict: user already registered'}), 409
 
         hashed_password = generate_password_hash(
             data['password'], method='sha256')
 
         data['date_registered'] = dteRegistered = datetime.utcnow().date()
         data['password'] = hashed_password
-        data['is_admin'] = False
 
         new_user = User(**data)
         user = db_services.add_user(new_user)
 
-        success_response = {'user': user, 'token': 'User created'}
+        success_response = {'user': user, 'message': 'User created'}
         return jsonify({'status': 201, 'data': [success_response]}), 201
 
     def login(self):
-        '''
+        """
         Function to login a user
         The user must be registered
         The function returns a json web token
+        """
 
-
-        '''
         data = request.get_json()
-        if not validator.has_login_required_fields(data):
-            abort(400)
+
+        errors = validator.has_login_required_fields(data)
+        if errors:
+            return jsonify({'status': 400, 'errors': errors}), 400
 
         user = db_services.get_user_by_email(data['email'])
-        if not user:
-            abort(401)
+
+        if user is None:
+            return jsonify({'status': 401, 'error':
+                            'incorrect credentials'}), 401
 
         if check_password_hash(user['password'], data['password']):
-            access_token = create_access_token(identity=user['id'])
+            access_token = create_access_token(user['id'], user['isadmin'])
             success_response = {'user': user,
                                 'access_token': access_token}
             return jsonify({'status': 200, 'data': [success_response]}), 200
         abort(401)
-

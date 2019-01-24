@@ -1,7 +1,7 @@
 from datetime import datetime
-from api import app, jwt
+from api import app
 from flask import Flask, request, json, jsonify, abort
-from flask_jwt_extended import get_jwt_identity
+from api.utility.authenticator import get_identity
 from api.validators.Incident_Validator import ValidateIncident
 from api.models.incident_model import Incident
 from api.models.user_model import User
@@ -27,7 +27,7 @@ class IncidentController():
 
         '''
         incident_body = request.get_json()
-        user_id = get_jwt_identity()
+        user_id = get_identity()
 
         incident_body['created_by'] = user_id
         incident_body['status'] = 'Pending'
@@ -53,7 +53,7 @@ class IncidentController():
         Function to retun all incident given an incident id
 
         '''
-        user_id = get_jwt_identity()
+        user_id = get_identity()
 
         incidents = db_services.get_all_incidents(
             user_id, incident_type
@@ -68,7 +68,7 @@ class IncidentController():
         If validation is passed an incident is returned
 
         '''
-        user_id = get_jwt_identity()
+        user_id = get_identity()
         incident = db_services.get_incident(
             user_id, incident_id)
 
@@ -86,7 +86,7 @@ class IncidentController():
 
         '''
         data = request.get_json()
-        user_id = get_jwt_identity()
+        user_id = get_identity()
 
         data['created_by'] = user_id
         data['id'] = incident_id
@@ -112,7 +112,7 @@ class IncidentController():
 
         '''
         data = request.get_json()
-        user_id = get_jwt_identity()
+        user_id = get_identity()
 
         data['created_by'] = user_id
         data['id'] = incident_id
@@ -147,7 +147,7 @@ class IncidentController():
         and a success message is returned
 
         '''
-        user_id = get_jwt_identity()
+        user_id = get_identity()
 
         user = db_services.get_user_by_id(user_id)
         if not user:

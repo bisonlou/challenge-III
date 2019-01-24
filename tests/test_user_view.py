@@ -31,7 +31,8 @@ class TestUserView(unittest.TestCase):
             'last_name': 'lou',
             'phone_number': '0753669897',
             'password': 'Pa$$word123',
-            'other_names': 'innocent'
+            'other_names': 'innocent',
+            'is_admin': True
         }
 
         response = self.test_client.post(
@@ -54,7 +55,9 @@ class TestUserView(unittest.TestCase):
             'last_name': 'lou',
             'phone_number': '0753669897',
             'password': '',
-            'other_names': ''
+            'other_names': '',
+            'is_admin': True
+
         }
 
         response = self.test_client.post(
@@ -65,9 +68,6 @@ class TestUserView(unittest.TestCase):
         message = json.loads(response.data)
 
         self.assertEqual(response.status_code, 400)
-        self.assertDictContainsSubset(
-            {'length': 'Password should be between 6 and 12 characters'},
-            message['data'])
 
     def test_register_user_with_missing_keys(self):
         """
@@ -79,7 +79,8 @@ class TestUserView(unittest.TestCase):
             'last_name': 'lou',
             'phone_number': '0753669897',
             'password': 'Pa$$word123',
-            'other_names': ''
+            'other_names': '',
+            'is_admin': True
         }
 
         response = self.test_client.post(
@@ -102,7 +103,8 @@ class TestUserView(unittest.TestCase):
             'last_name': 'lou',
             'phone_number': '0753669897',
             'password': '',
-            'other_names': ''
+            'other_names': '',
+            'is_admin': True
         }
 
         response = self.test_client.post(
@@ -125,7 +127,8 @@ class TestUserView(unittest.TestCase):
             'last_name': 'lou',
             'phone_number': '0753669897',
             'password': 'Pa$$word123456',
-            'other_names': ''
+            'other_names': '',
+            'is_admin': True
         }
 
         response = self.test_client.post(
@@ -136,9 +139,6 @@ class TestUserView(unittest.TestCase):
         message = json.loads(response.data)
 
         self.assertEqual(response.status_code, 400)
-        self.assertDictContainsSubset(
-            {'length': 'Password should be between 6 and 12 characters'},
-            message['data'])
 
     def test_register_with_long_invalid_email(self):
         """
@@ -151,7 +151,8 @@ class TestUserView(unittest.TestCase):
             'last_name': 'lou',
             'phone_number': '0753669897',
             'password': 'Pa$$word123',
-            'other_names': 'innocent'
+            'other_names': 'innocent',
+            'is_admin': True
         }
 
         response = self.test_client.post(
@@ -174,7 +175,8 @@ class TestUserView(unittest.TestCase):
             'last_name': 'lou',
             'phone_number': '0753669897',
             'password': 'Pa$$word123',
-            'other_names': 'innocent'
+            'other_names': 'innocent',
+            'is_admin': True
         }
 
         self.test_client.post(
@@ -202,7 +204,8 @@ class TestUserView(unittest.TestCase):
             'last_name': 'lou',
             'phone_number': '0753669897',
             'password': 'Pa$$word123',
-            'other_names': 'innocent'
+            'other_names': 'innocent',
+            'is_admin': True
         }
 
         self.test_client.post(

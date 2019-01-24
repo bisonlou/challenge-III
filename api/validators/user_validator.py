@@ -13,7 +13,7 @@ class UserValidator():
         '''
         Function to check if user keys and key data is present
         Also checks if data is in required format
-        Returns True on succes otherwise False
+        Returns True on success otherwise False
 
         '''
         keys = ['user_name', 'password', 'first_name',

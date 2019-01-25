@@ -6,7 +6,7 @@ from datetime import datetime
 from api import app
 from flask import Flask, request, json, jsonify, abort
 from api.utility.authenticator import get_identity
-from api.validators.incident_validator import ValidateIncident
+from api.validators.Incident_Validator import ValidateIncident
 from api.models.incident_model import Incident
 from api.models.user_model import User
 from api.models.db import DbConnection

@@ -148,18 +148,16 @@ class TestRedFlagView(unittest.TestCase):
 
     def test_add_bad_red_flag(self):
         """
-        Test adding a red flag with images
-        and videos keys not of type list but string
+        Test adding a red flag without a title
         Expect 400
         """
         red_flag = {
-            'title': 'Police officer at CPS Badge #162',
             'comment': 'Took a bribe',
             'location': '(-65.712557, -15.000182)',
             'type': 'red-flag',
             'status': 'pending',
-            'images': 'photo_0979.jpg',
-            'videos': 'mov_0987.mp4'
+            'images': ['photo_0979.jpg'],
+            'videos': ['mov_0987.mp4']
         }
 
         response = self.test_client.post(

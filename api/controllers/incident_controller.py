@@ -1,8 +1,12 @@
+"""
+Module to handle incident CRUD operations
+"""
+
 from datetime import datetime
 from api import app
 from flask import Flask, request, json, jsonify, abort
 from api.utility.authenticator import get_identity
-from api.validators.Incident_Validator import ValidateIncident
+from api.validators.incident_validator import ValidateIncident
 from api.models.incident_model import Incident
 from api.models.user_model import User
 from api.models.db import DbConnection
@@ -28,7 +32,7 @@ class IncidentController():
         user_id = get_identity()
 
         incident_body['created_by'] = user_id
-        incident_body['status'] = 'Pending'
+        incident_body['status'] = 'pending'
         incident_body['created_on'] = datetime.utcnow().date()
 
         errors = incident_validator.has_required_keys(incident_body)
@@ -54,7 +58,7 @@ class IncidentController():
         user_id = get_identity()
 
         incidents = db_services.get_all_incidents(
-                    user_id, incident_type)
+            user_id, incident_type)
 
         return jsonify({'status': 200, 'data': [incidents]})
 
@@ -66,8 +70,7 @@ class IncidentController():
 
         '''
         user_id = get_identity()
-        incident = db_services.get_incident(
-            user_id, incident_id)
+        incident = db_services.get_incident(incident_id)
 
         if not incident:
             return jsonify({'status': 404, 'errors':
@@ -93,21 +96,25 @@ class IncidentController():
         if errors:
             return jsonify({'status': 400, 'errors': errors}), 400
 
-        current_incident = db_services.get_incident(user_id, incident_id)
+        current_incident = db_services.get_incident(incident_id)
         if current_incident is None:
             return jsonify({'status': 404, 'errors':
                             'incident not found'}), 404
+
+        error = incident_validator.is_modifiable(current_incident, user_id)
+        if error:
+            return jsonify({'status': 403, 'errors': error}), 403
 
         update_incident = Incident(**data)
 
         updated_incident = db_services.put_incident(update_incident)
 
         return jsonify({
-                'status': 200,
-                'data': [updated_incident]
+            'status': 200,
+            'data': [updated_incident]
             })
 
-    def patch_incident(self, incident_id, incident_type, update_key):
+    def patch_incident(self, incident_id, update_key):
         '''
         Function to update a property of an incident
         Validates the incident exists and belongs to this user
@@ -125,23 +132,23 @@ class IncidentController():
         if errors:
             return jsonify({'status': 400, 'errors': errors}), 400
 
-        existing_incident = db_services.get_incident(
-                            user_id, incident_id)
+        existing_incident = db_services.get_incident(incident_id)
 
         if not existing_incident:
             return jsonify({'status': 404, 'errors':
                             'incident not found'}), 404
 
-        if not incident_validator.is_modifiable(existing_incident):
-            return jsonify({'status': 403, 'error':
-                            'Incident no longer modifiable'}), 403
+        incident_type = existing_incident['type']
+
+        errors = incident_validator.is_modifiable(existing_incident, user_id)
+        if errors:
+            return jsonify({'status': 403, 'error': errors}), 403
 
         update_incident = Incident(**data)
 
         incident = db_services.patch_incident(
-                                    update_incident,
-                                    incident_type,
-                                    update_key)
+            update_incident, incident_type, update_key)
+
         if incident is None:
             return jsonify({'status': 401, 'data':
                             '{} not found'.format(incident_type)}), 200
@@ -154,7 +161,7 @@ class IncidentController():
 
         return jsonify({'status': 200, 'data': success_response}), 200
 
-    def delete_incident(self, incident_type, incident_id):
+    def delete_incident(self, incident_id):
         '''
         Function to delete an incident
         Validates the incident exists and belongs to this user
@@ -170,12 +177,17 @@ class IncidentController():
             return jsonify({'status': 401, 'errors':
                             'You are not authenticated'}), 401
 
-        existing_incident = db_services.get_incident(
-                            user_id,
-                            incident_id)
+        existing_incident = db_services.get_incident(incident_id)
+
         if existing_incident is None:
             return jsonify({'status': 404, 'error':
                             'Incident doesnt exist'}), 404
+
+        errors = incident_validator.is_modifiable(existing_incident, user_id)
+        if errors:
+            return jsonify({'status': 403, 'error': errors}), 403
+
+        incident_type = existing_incident['type']
 
         deleted_id = db_services.delete_incident(existing_incident['id'])
         if deleted_id is None:

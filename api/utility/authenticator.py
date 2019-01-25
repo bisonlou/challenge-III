@@ -93,7 +93,7 @@ def admin_denied(function):
     return wrapper
 
 
-def admin_required(func):
+def admin_required(function):
     """
     Deny non admin from accessing the resource
     """

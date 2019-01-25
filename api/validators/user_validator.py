@@ -138,6 +138,7 @@ class UserValidator():
             return 'phone number is wrong'
 
     def has_proper_email(self, email):
-        if not validate_email(email):
+        pattern = "(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)"
+        if not re.match(pattern, email):
             return 'email is wrong'.format(email)
 

@@ -44,9 +44,9 @@ class ValidateIncident():
         if media_content_errors:
             return media_content_errors
 
-        # media_format_errors = self.has_bad_media_format(data, media_keys)
-        # if media_format_errors:
-        #     return media_format_errors
+        media_format_errors = self.has_bad_media_format(data, media_keys)
+        if media_format_errors:
+            return media_format_errors
 
         incident_type_errors = self.has_bad_incident_type(data['type'])
         if incident_type_errors:
@@ -89,14 +89,14 @@ class ValidateIncident():
                 if type(data[key][index]) is not str:
                     return 'list contents should be strings'
 
-    # def has_bad_media_format(self, data, media_keys):
-    #     media_key_list = [key for key in media_keys if key in data]
-    #     for key in media_key_list:
-    #         for index in range(len(data[key])):
-    #             pattern = '([^\\s]+(\\.(?i)(jpg|png|gif|bmp|mp4|mov|3gp))$)'
-    #             if not re.match(pattern, data[key][index]):
-    #                 return '''unexpected media format, expected one of
-    #                 jpg|png|gif|bmp|mp4|mov|3gp'''
+    def has_bad_media_format(self, data, media_keys):
+        media_key_list = [key for key in media_keys if key in data]
+        for key in media_key_list:
+            for index in range(len(data[key])):
+                pattern = '([^\\s]+(\\.(?i)(jpg|png|gif|bmp|mp4|mov|3gp))$)'
+                if not re.match(pattern, data[key][index]):
+                    return '''unexpected media format, expected one of
+                    jpg|png|gif|bmp|mp4|mov|3gp'''
 
     def has_empty_feilds(self, data, keys):
         """ get list of keys with missing data"""

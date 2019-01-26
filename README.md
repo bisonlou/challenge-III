@@ -30,7 +30,7 @@ pip install -r requirements.txt
 
 export variable URI as postrgress connection string
 
-exporrt variable SECRET_KEY as jwt encryption string
+export variable SECRET_KEY as jwt encryption string
 
 python app.py
 

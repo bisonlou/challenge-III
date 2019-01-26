@@ -28,6 +28,10 @@ source venv/Scripts/activate
 
 pip install -r requirements.txt
 
+export variable URI as postrgress connection string
+
+export variable SECRET_KEY as jwt encryption string
+
 python app.py
 
 ```

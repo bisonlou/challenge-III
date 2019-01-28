@@ -13,6 +13,7 @@ class TestUserView(unittest.TestCase):
         """
         self.test_client = test_client
         self.db_services = DbConnection()
+        
 
     def tearDown(self):
         """

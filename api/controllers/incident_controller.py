@@ -2,17 +2,20 @@
 Module to handle incident CRUD operations
 """
 
-from datetime import datetime
 from api import app
-from flask import Flask, request, json, jsonify, abort
-from api.utility.authenticator import get_identity
-from api.validators.Incident_Validator import ValidateIncident
-from api.models.incident_model import Incident
+from datetime import datetime
 from api.models.user_model import User
 from api.models.db import DbConnection
+from api.models.incident_model import Incident
+from api.utility.authenticator import get_identity
+from api.validators.general_validator import(
+    validate_incident,
+    is_modifiable,
+    is_owner
+)
+from flask import Flask, request, json, jsonify, abort
 
 
-incident_validator = ValidateIncident()
 db_services = DbConnection()
 
 
@@ -35,7 +38,7 @@ class IncidentController():
         incident_body['status'] = 'pending'
         incident_body['created_on'] = datetime.utcnow().date()
 
-        errors = incident_validator.has_required_keys(incident_body)
+        errors = validate_incident(incident_body)
         if errors:
             return jsonify({'status': 400, 'errors': errors}), 400
 
@@ -92,7 +95,7 @@ class IncidentController():
         data['created_by'] = user_id
         data['id'] = incident_id
 
-        errors = incident_validator.has_required_keys(data)
+        errors = validate_incident(data)
         if errors:
             return jsonify({'status': 400, 'errors': errors}), 400
 
@@ -101,7 +104,7 @@ class IncidentController():
             return jsonify({'status': 404, 'errors':
                             'incident not found'}), 404
 
-        error = incident_validator.is_modifiable(current_incident, user_id)
+        error = is_modifiable(current_incident, user_id)
         if error:
             return jsonify({'status': 403, 'errors': error}), 403
 
@@ -128,7 +131,7 @@ class IncidentController():
         data['created_by'] = user_id
         data['id'] = incident_id
 
-        errors = incident_validator.has_required_keys(data)
+        errors = validate_incident(data)
         if errors:
             return jsonify({'status': 400, 'errors': errors}), 400
 
@@ -140,7 +143,7 @@ class IncidentController():
 
         incident_type = existing_incident['type']
 
-        errors = incident_validator.is_modifiable(existing_incident, user_id)
+        errors = is_modifiable(existing_incident, user_id)
         if errors:
             return jsonify({'status': 403, 'error': errors}), 403
 
@@ -183,7 +186,7 @@ class IncidentController():
             return jsonify({'status': 404, 'error':
                             'Incident doesnt exist'}), 404
 
-        errors = incident_validator.is_modifiable(existing_incident, user_id)
+        errors = is_modifiable(existing_incident, user_id)
         if errors:
             return jsonify({'status': 403, 'error': errors}), 403
 

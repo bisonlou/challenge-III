@@ -1,13 +1,18 @@
-from datetime import datetime
 from api import app
+from datetime import datetime
 from api.models.user_model import User
 from api.models.db import DbConnection
-from api.validators.user_validator import UserValidator
-from api.utility.authenticator import create_access_token
-from werkzeug.security import generate_password_hash, check_password_hash
 from flask import jsonify, abort, request
+from api.utility.authenticator import create_access_token
+from werkzeug.security import (
+    generate_password_hash,
+    check_password_hash)
+from api.validators.general_validator import (
+    validate_login,
+    validate_user,
+    is_duplicate_email)
 
-validator = UserValidator()
+
 db_services = DbConnection()
 
 
@@ -23,11 +28,11 @@ class UserController():
         '''
         data = request.get_json()
 
-        errors = validator.has_required_fields(data)
+        errors = validate_user(data)
         if errors:
             return jsonify({'status': 400, 'errors': errors}), 400
 
-        if validator.Check_for_duplicate_email(data['email']):
+        if is_duplicate_email(data['email']):
             return jsonify({'status': 409, 'errors':
                             'Conflict: user already registered'}), 409
 
@@ -52,7 +57,7 @@ class UserController():
 
         data = request.get_json()
 
-        errors = validator.has_login_required_fields(data)
+        errors = validate_login(data)
         if errors:
             return jsonify({'status': 400, 'errors': errors}), 400
 

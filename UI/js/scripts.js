@@ -8,7 +8,7 @@ return parent.appendChild(el);
 
 function loadRedFlags(){
   const table = document.getElementById('redflag-table');
-  const url = 'https://knightedge.herokuapp.com/api/v1/redflags';
+  const url = 'http://127.0.0.1:5000/api/v1/redflags';
   
   fetch(url)
   .then((resp) => resp.json())
@@ -33,7 +33,7 @@ function loadRedFlags(){
 }
 
 function register(){
-  url = 'https://knightedge.herokuapp.com/api/v1/auth/signup'
+  url = 'http://127.0.0.1:5000/api/v1/auth/signup'
   var data = {
     "user_name": "innocent",
     "email": "bisonlou@gmail.com",

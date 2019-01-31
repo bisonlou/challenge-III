@@ -31,3 +31,28 @@ function loadRedFlags(){
       console.log(JSON.stringify(error));
     });   
 }
+
+function register(){
+  url = 'http://127.0.0.1:5000/api/v1/auth/signup'
+  var data = {
+    "user_name": "innocent",
+    "email": "bisonlou@gmail.com",
+    "first_name": "lou",
+    "last_name": "lou",
+    "phone_number": "0753669897",
+    "password": "Pa$$word123",
+    "other_names": "",
+    "is_admin": false
+  };
+
+  fetch(url, {
+    method: 'POST', // or 'PUT'
+    body: JSON.stringify(data), // data can be `string` or {object}!
+    headers:{
+      'Content-Type': 'application/json'
+    }
+  }).then(res => res.json())
+  .then(response => console.log('Success:', JSON.stringify(response)))
+  .catch(error => console.error('Error:', error));
+
+}

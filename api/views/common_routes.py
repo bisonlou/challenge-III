@@ -9,7 +9,8 @@ incident_controller = IncidentController()
 
 @app.route('/', methods=['GET'])
 def index():
-    return jsonify({
+
+    data = jsonify({
         'post incident': '/api/v1/incidents',
         'get red flags': '/api/v1/redflags',
         'get red flag': '/api/v1/redflags/<flag_id>',
@@ -22,6 +23,11 @@ def index():
         'delete intervention': '/api/v1/interventions/<intevention_id>',
         'patch status': '/api/v1/incidents/<incident_id>'
     }), 200
+
+    response = app.make_response(data)
+    response.headers['Access-Control-Allow-Origin'] = '*'
+
+    return response
 
 
 @app.route('/api/v1/incidents', methods=['POST'])

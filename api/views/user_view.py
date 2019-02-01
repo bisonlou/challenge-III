@@ -10,6 +10,7 @@ user_controller = UserController()
 def register():
     return user_controller.register()
 
+
 @app.route('/api/v1/auth/login', methods=['POST'])
 @json_data_required
 def login():

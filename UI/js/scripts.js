@@ -114,7 +114,7 @@ fetch(url,{
 
 
 function getRedflags(){
-  url = 'http://127.0.0.1:5000/api/v1/redflags';
+url = 'http://127.0.0.1:5000/api/v1/redflags';
 
 fetch(url,{
   headers: {
@@ -128,14 +128,16 @@ fetch(url,{
 .then(response => {
   return response.json();
 }).then(data => {
+  
   console.log(data)
 }).catch(err => {
   console.log(err);
 });
 }
 
+
 function postRedflags(){
-  url = 'http://127.0.0.1:5000/api/v1/redflags';
+  url = 'http://127.0.0.1:5000/api/v1/incidents';
 
   title = document.getElementById('title').value
   comment = document.getElementById('comment').value
@@ -153,7 +155,9 @@ fetch(url,{
   'Accept': 'application/json, text/plain, */*',
   'Content-Type': 'application/json'},
   headers: {
-        'Authorization': document.cookie
+        'Authorization': document.cookie,
+        'Accept': 'application/json, text/plain, */*',
+        'Content-Type': 'application/json'
     }
   })
 

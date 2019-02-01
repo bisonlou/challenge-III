@@ -137,8 +137,18 @@ fetch(url,{
 function postRedflags(){
   url = 'http://127.0.0.1:5000/api/v1/redflags';
 
+  title = document.getElementById('title').value
+  comment = document.getElementById('comment').value
+
 fetch(url,{
   method: 'post',
+  body: JSON.stringify({
+        'title': title,
+        'comment': comment,
+        'location': '(00.000000, 00.000000)',
+        'type': 'red-flag',
+        'status': 'pending'
+       }),
   headers: {
   'Accept': 'application/json, text/plain, */*',
   'Content-Type': 'application/json'},

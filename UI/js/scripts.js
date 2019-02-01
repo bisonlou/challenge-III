@@ -107,6 +107,10 @@ fetch(url,{
   token = data['data'][0]['access_token'];
   bearer_token = "Bearer " + token + ";";
   document.cookie = "token=" + bearer_token;
+
+  if (data['status'] == 200){
+    window.location.href = "http://localhost/iReporter/home.html";
+  }
 }).catch(err => {
   console.log(err);
 });
@@ -129,6 +133,18 @@ fetch(url,{
   return response.json();
 }).then(data => {
   
+  // redflags_table = document.getElementById('redflag-table');
+
+  // for(i=0; i< (data['data']).length(); i++){
+  //       var row = table.insertRow(i);
+  //       var cell1 = row.insertCell(0);
+  //       var cell2 = row.insertCell(1);
+  //       var cell3 = row.insertCell(2);
+  //       cell1.innerHTML = data['data'][i]['title'];
+  //       cell2.innerHTML =  data['data'][i]['comment'];
+  //       cell3.innerHTML =  data['data'][i]['status'];
+  // }
+
   console.log(data)
 }).catch(err => {
   console.log(err);
@@ -164,7 +180,9 @@ fetch(url,{
 .then(response => {
   return response.json();
 }).then(data => {
-  console.log(data)
+  if (data['status'] == 201){
+    window.location.href = "http://localhost/iReporter/home.html";
+  }
 }).catch(err => {
   console.log(err);
 });

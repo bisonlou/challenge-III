@@ -78,7 +78,9 @@ fetch(url,{
 .then(response => {
   return response.json();
 }).then(data => {
-  console.log(data);
+  if (data['status'] == 201){
+    window.location.href = "http://localhost/iReporter/login.html";
+  }
 }).catch(err => {
   console.log(err);
 });
@@ -133,19 +135,22 @@ fetch(url,{
   return response.json();
 }).then(data => {
   
-  // redflags_table = document.getElementById('redflag-table');
+  redflags_table = document.getElementById('redflag-table');
 
-  // for(i=0; i< (data['data']).length(); i++){
-  //       var row = table.insertRow(i);
-  //       var cell1 = row.insertCell(0);
-  //       var cell2 = row.insertCell(1);
-  //       var cell3 = row.insertCell(2);
-  //       cell1.innerHTML = data['data'][i]['title'];
-  //       cell2.innerHTML =  data['data'][i]['comment'];
-  //       cell3.innerHTML =  data['data'][i]['status'];
-  // }
+  for(i=0; i< (data['data'][0]).length; i++){
+        var row = redflags_table.insertRow(i + 1);
+        
+        var cell1 = row.insertCell(0);
+        var cell2 = row.insertCell(1);
+        var cell3 = row.insertCell(2);
+        var cell4 = row.insertCell(3);
+        cell1.innerHTML = data['data'][0][i]['createdon'];
+        cell2.innerHTML =  data['data'][0][i]['title'];
+        cell3.innerHTML =  data['data'][0][i]['status'];
+        cell4.innerHTML =  '<a href="./redflag_edit.html">Edit</a> | <a href="./redflag_confirm_delete.html">Delete</a>';
 
-  console.log(data)
+  }
+ 
 }).catch(err => {
   console.log(err);
 });
@@ -165,7 +170,9 @@ fetch(url,{
         'comment': comment,
         'location': '(00.000000, 00.000000)',
         'type': 'red-flag',
-        'status': 'pending'
+        'status': 'pending',
+        'images': ['image_001.jpg'],
+        'videos': ['video_001.mp4']
        }),
   headers: {
   'Accept': 'application/json, text/plain, */*',

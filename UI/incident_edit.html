@@ -5,7 +5,7 @@
     <meta name="description" content="Hold your leaders accountable.">
     <meta name="author" content="Innocent Lou">
 
-    <title>iReporter | Add Intervention.</title>
+    <title>iReporter | Edit Incident.</title>
     <meta name="viewport" content="width=device-width">
     <!--  CSS -->
     <link href="./css/style.css" rel="stylesheet">
@@ -13,7 +13,7 @@
 
 </head>
 
-<body>
+<body onload="getIncident()">
     <div class="bg-image">
         <header id="main-header">
             <div class="container">
@@ -48,7 +48,21 @@
                 <input type="file">
                 <div class="media-table">
                     <table>
-
+                        <tr>
+                            <td>image_001.jpg</td>
+                            <td>250kb</td>
+                            <td><a href="#">Delete</a></td>
+                        </tr>
+                        <tr>
+                            <td>image_002.jpg</td>
+                            <td>144kb</td>
+                            <td><a href="#">Delete</a></td>
+                        </tr>
+                        <tr>
+                            <td>image_003.jpg</td>
+                            <td>205kb</td>
+                            <td><a href="#">Delete</a></td>
+                        </tr>
                     </table>
                 </div>
             </div>
@@ -57,14 +71,28 @@
                 <input type="file">
                 <div class="media-table">
                     <table>
-
+                        <tr>
+                            <td>video_001.mov</td>
+                            <td>10420kb</td>
+                            <td><a href="#">Delete</a></td>
+                        </tr>
+                        <tr>
+                            <td>video_002.mp4</td>
+                            <td>25000kb</td>
+                            <td><a href="#">Delete</a></td>
+                        </tr>
+                        <tr>
+                            <td>video_003.mp4</td>
+                            <td>35200kb</td>
+                            <td><a href="#">Delete</a></td>
+                        </tr>
                     </table>
                 </div>
             </div>
     </div>
     </form>
     <div class="flag-box-submit">
-        <input type="submit" onclick="postIncident('intervention')" value="Submit">
+        <input type="submit" value="Submit Changes">
     </div>
     </div>
 

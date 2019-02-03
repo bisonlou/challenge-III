@@ -1,6 +1,7 @@
 
 function welcome(){
-  url = 'http://127.0.0.1:5000/';
+  url = 'https://knightedge.herokuapp.com/';
+  // url = 'http://127.0.0.1:5000/';
 
   fetch(url)
   .then(response => {
@@ -13,7 +14,8 @@ function welcome(){
 }
 
 function register(){
-  url = 'http://127.0.0.1:5000/api/v1/auth/signup';
+  url = 'https://knightedge.herokuapp.com/api/v1/auth/signup';
+  // url = 'http://127.0.0.1:5000/api/v1/auth/signup';
 
   email = document.getElementById('email').value
   username = document.getElementById('username').value
@@ -38,7 +40,7 @@ function register(){
           'phone_number': phonenumber,
           'password': password,
           'other_names': othernames,
-          'is_admin': true
+          'is_admin': false
       })
     })
 
@@ -54,7 +56,8 @@ function register(){
 }
 
 function login(){
-  url = 'http://127.0.0.1:5000/api/v1/auth/login';
+  url = 'https://knightedge.herokuapp.com/api/v1/auth/login';
+  // url = 'http://127.0.0.1:5000/api/v1/auth/login';
 
   email = document.getElementById('login_email').value
   password = document.getElementById('login_password').value
@@ -87,7 +90,8 @@ function login(){
 
 
 function getRedflags(){
-  url = 'http://127.0.0.1:5000/api/v1/redflags';
+  url = 'https://knightedge.herokuapp.com/api/v1/redflags';
+  // url = 'http://127.0.0.1:5000/api/v1/redflags';
 
   fetch(url,{
     headers: {
@@ -149,7 +153,8 @@ function getRedflags(){
 }
 
 function getInterventions(){
-  url = 'http://127.0.0.1:5000/api/v1/interventions';
+  url = 'https://knightedge.herokuapp.com/api/v1/interventions';
+  // url = 'http://127.0.0.1:5000/api/v1/interventions';
 
   fetch(url,{
     headers: {
@@ -212,7 +217,8 @@ function getInterventions(){
 
 
 function postIncident(incidentType){
-  url = 'http://127.0.0.1:5000/api/v1/incidents';
+  url = 'https://knightedge.herokuapp.com/api/v1/incidents';
+  // url = 'http://127.0.0.1:5000/api/v1/incidents';
 
   title = document.getElementById('title').value
   comment = document.getElementById('comment').value
@@ -255,10 +261,18 @@ function getIncident(){
   var incidentId = /id=([^&]+)/.exec(url)[1];
   incidentId = parseInt(incidentId, 10)
 
-  title = document.getElementById('title')
-  comment = document.getElementById('comment')
+  title = document.getElementById('title');
+  comment = document.getElementById('comment');
 
-  url = 'http://127.0.0.1:5000/api/v1/incidents/' + incidentId;
+  url = '';
+  if (incidentType == 'red-flag'){
+    url = url = 'https://knightedge.herokuapp.com/api/v1/redflags/' + incidentId;
+    // url = url = 'http://127.0.0.1:5000/api/v1/redflags/' + incidentId;
+  }
+  if (incidentType == 'intervention'){
+    url = 'https://knightedge.herokuapp.com/api/v1/interventions/' + incidentId;
+    // url = 'http://127.0.0.1:5000/api/v1/interventions/' + incidentId;
+  }
 
   fetch(url,{
     method: 'get',
@@ -279,8 +293,8 @@ function getIncident(){
       window.location.href = "http://localhost/iReporter/index.html";
     }
 
-    title.innerHTML = data['data'][0]['title']
-    comment.innerHTML = data['data'][0]['comment']
+    title.value = data['data'][0]['title'];
+    comment.innerHTML = data['data'][0]['comment'];
 
   }).catch(err => {
     console.log(err);

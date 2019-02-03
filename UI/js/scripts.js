@@ -14,8 +14,8 @@ function welcome(){
 }
 
 function register(){
-  url = 'https://knightedge.herokuapp.com/api/v1/auth/signup';
-  // url = 'http://127.0.0.1:5000/api/v1/auth/signup';
+  // url = 'https://knightedge.herokuapp.com/api/v1/auth/signup';
+  url = 'http://127.0.0.1:5000/api/v1/auth/signup';
 
   email = document.getElementById('email').value
   username = document.getElementById('username').value
@@ -56,8 +56,8 @@ function register(){
 }
 
 function login(){
-  url = 'https://knightedge.herokuapp.com/api/v1/auth/login';
-  // url = 'http://127.0.0.1:5000/api/v1/auth/login';
+  // url = 'https://knightedge.herokuapp.com/api/v1/auth/login';
+  url = 'http://127.0.0.1:5000/api/v1/auth/login';
 
   email = document.getElementById('login_email').value
   password = document.getElementById('login_password').value
@@ -90,8 +90,8 @@ function login(){
 
 
 function getRedflags(){
-  url = 'https://knightedge.herokuapp.com/api/v1/redflags';
-  // url = 'http://127.0.0.1:5000/api/v1/redflags';
+  // url = 'https://knightedge.herokuapp.com/api/v1/redflags';
+  url = 'http://127.0.0.1:5000/api/v1/redflags';
 
   fetch(url,{
     headers: {
@@ -153,8 +153,8 @@ function getRedflags(){
 }
 
 function getInterventions(){
-  url = 'https://knightedge.herokuapp.com/api/v1/interventions';
-  // url = 'http://127.0.0.1:5000/api/v1/interventions';
+  // url = 'https://knightedge.herokuapp.com/api/v1/interventions';
+  url = 'http://127.0.0.1:5000/api/v1/interventions';
 
   fetch(url,{
     headers: {
@@ -217,8 +217,8 @@ function getInterventions(){
 
 
 function postIncident(incidentType){
-  url = 'https://knightedge.herokuapp.com/api/v1/incidents';
-  // url = 'http://127.0.0.1:5000/api/v1/incidents';
+  // url = 'https://knightedge.herokuapp.com/api/v1/incidents';
+  url = 'http://127.0.0.1:5000/api/v1/incidents';
 
   title = document.getElementById('title').value
   comment = document.getElementById('comment').value
@@ -266,12 +266,12 @@ function getIncident(){
 
   url = '';
   if (incidentType == 'red-flag'){
-    url = url = 'https://knightedge.herokuapp.com/api/v1/redflags/' + incidentId;
-    // url = url = 'http://127.0.0.1:5000/api/v1/redflags/' + incidentId;
+    // url = url = 'https://knightedge.herokuapp.com/api/v1/redflags/' + incidentId;
+    url = url = 'http://127.0.0.1:5000/api/v1/redflags/' + incidentId;
   }
   if (incidentType == 'intervention'){
-    url = 'https://knightedge.herokuapp.com/api/v1/interventions/' + incidentId;
-    // url = 'http://127.0.0.1:5000/api/v1/interventions/' + incidentId;
+    // url = 'https://knightedge.herokuapp.com/api/v1/interventions/' + incidentId;
+    url = 'http://127.0.0.1:5000/api/v1/interventions/' + incidentId;
   }
 
   fetch(url,{

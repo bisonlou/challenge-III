@@ -77,7 +77,6 @@ class TestRedFlagView(unittest.TestCase):
                                response_2.data)['data'][0]['access_token']
 
         red_flag_1 = {
-            'created_on': '2018-12-24',
             'title': 'Police Officer',
             'comment': 'Police officer at CPS Badge #162',
             'location': '(-65.712557, -15.000182)',

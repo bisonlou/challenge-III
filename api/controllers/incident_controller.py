@@ -34,17 +34,23 @@ class IncidentController():
         incident_body = request.get_json()
         user_id = get_identity()
 
-        incident_body['created_by'] = user_id
+        incident_body['createdby'] = user_id
         incident_body['status'] = 'pending'
-        incident_body['created_on'] = datetime.utcnow().date()
+        incident_body['createdon'] = datetime.utcnow().date()
 
         errors = validate_incident(incident_body)
         if errors:
             return jsonify({'status': 400, 'errors': errors}), 400
 
         incident_type = incident_body['type']
+        images = self.get_media(incident_body, 'images')
+        videos = self.get_media(incident_body, 'videos')
 
         incident = Incident(**incident_body)
+
+        self.add_incident_media(incident, images, 'images')
+        self.add_incident_media(incident, videos, 'videos')
+
         incident_id = db_services.insert_incident(incident)
 
         success_response = {
@@ -79,7 +85,7 @@ class IncidentController():
             return jsonify({'status': 404, 'errors':
                             'Incident does not exist'}), 404
 
-        return jsonify({'status': 200, 'data': [incident]}), 200
+        return jsonify({'status': 200, 'data': [incident.to_dict()]}), 200
 
     def put_incident(self, incident_id):
         '''
@@ -204,3 +210,15 @@ class IncidentController():
         }
 
         return jsonify({'status': 200, 'data': success_response}), 200
+
+    def get_media(self, incident, media_type):
+        if media_type in incident:
+            return incident[media_type]
+
+    def add_incident_media(self, incident, media_list, media_type):
+        if media_list:
+            for media in media_list:
+                if media_type == 'images':
+                    incident.add_image(media)
+                elif media_type == 'videos':
+                    incident.add_video(media)

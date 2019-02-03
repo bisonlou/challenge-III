@@ -7,26 +7,32 @@ class Incident():
     def __init__(self, **kwags):
         self._id = kwags.get('id', 0)
         self._title = kwags.get('title', '')
-        self._created_on = kwags.get('created_on', '')
+        self._createdon = kwags.get('createdon', '')
         self._comment = kwags.get('comment', '')
-        self._created_by = kwags.get('created_by', '')
+        self._createdby = kwags.get('createdby', '')
         self._location = kwags.get('location', '')
         self._status = kwags.get('status', '')
-        self._incident_type = kwags.get('type', '')
-        self._images = kwags.get('images', list())
-        self._videos = kwags.get('videos', list())
+        self._type = kwags.get('type', '')
+        self._images = []
+        self._videos = []
+
+    def add_image(self, name):
+        self._images.append(name)
+
+    def add_video(self, name):
+        self._videos.append(name)
 
     @property
     def id(self):
         return self._id
 
     @property
-    def created_on(self):
-        return self._created_on
+    def createdon(self):
+        return self._createdon
 
     @property
-    def created_by(self):
-        return self._created_by
+    def createdby(self):
+        return self._createdby
 
     @property
     def title(self):
@@ -53,12 +59,12 @@ class Incident():
         return self._status
 
     @property
-    def incident_type(self):
-        return self._incident_type
+    def type(self):
+        return self._type
 
-    @created_on.setter
+    @createdon.setter
     def created_on(self, created_on):
-        self._created_on = created_on
+        self._createdon = created_on
 
     @title.setter
     def title(self, title):
@@ -86,12 +92,12 @@ class Incident():
 
     def to_dict(self):
         return dict(id=self._id,
-                    created_on=self._created_on,
-                    created_by=self._created_by,
+                    createdon=self._createdon,
+                    createdby=self._createdby,
                     title=self._title,
                     comment=self._comment,
                     location=self._location,
-                    type=self._incident_type,
+                    type=self._type,
                     status=self._status,
                     images=self._images,
                     videos=self._videos

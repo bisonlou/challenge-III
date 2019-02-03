@@ -1,6 +1,7 @@
-from os import environ
 import psycopg2
 import psycopg2.extras
+from os import environ
+from api.models.incident_model import Incident
 
 
 class DbConnection():
@@ -67,8 +68,8 @@ class DbConnection():
                      createdBy, location, status) \
                     VALUES('{}', '{}', '{}','{}', '{}', '{}','{}')\
                     RETURNING id;".format(
-            incident.created_on, incident.title, incident.comment,
-            incident.incident_type, incident.created_by, incident.location,
+            incident.createdon, incident.title, incident.comment,
+            incident.type, incident.createdby, incident.location,
             incident.status)
 
         self.cursor.execute(new_incident)
@@ -97,20 +98,14 @@ class DbConnection():
         query = ""
         # check if user is admin
         if self.check_user_is_admin(user_id):
-            incidents_query = "select * from incidents inner join images \
-                             ON incidents.id = images.incident \
-                             INNER JOIN videos \
-                             ON incidents.id = videos.incident \
+            incidents_query = "select * from incidents \
                              WHERE incidents.type = '{}';\
                             ".format(incident_type)
         else:
-            incidents_query = "select * from incidents inner join images \
-                             on incidents.id = images.incident \
-                             INNER JOIN videos \
-                             ON incidents.id = videos.incident \
-                             WHERE incidents.type = '{}' \
-                             AND incidents.createdby = {};".format(
-                             incident_type, user_id)
+            incidents_query = "select * from incidents \
+                            WHERE incidents.type = '{}' \
+                            AND incidents.createdby = {};".format(
+                            incident_type, user_id)
 
         self.cursor.execute(incidents_query)
         returned_incidents = self.cursor.fetchall()
@@ -131,11 +126,33 @@ class DbConnection():
                              WHERE incidents.id = {};\
                             ".format(incident_id)
 
+        images_query = "select * from images \
+                             WHERE incident = {};\
+                            ".format(incident_id)
+
+        videos_query = "select * from videos \
+                             WHERE incident = {};\
+                            ".format(incident_id)
+
         self.cursor.execute(incidents_query)
         incident = self.cursor.fetchone()
         if incident:
-            return incident
+            incident_obj = Incident(**incident)
 
+            self.cursor.execute(images_query)
+            images = self.cursor.fetchall()
+            if images:
+                for image in images:
+                    incident_obj.add_image(image['filename'])
+
+            self.cursor.execute(videos_query)
+            videos = self.cursor.fetchall()
+            if videos:
+                for video in videos:
+                    incident_obj.add_video(video['filename'])
+
+            return incident_obj
+            
     def put_incident(self, update_incident):
         update_query = "UPDATE incidents SET title = '{}', location = '{}', comment = '{}'  WHERE id = {} AND createdby = {} RETURNING id".format(
             update_incident.title,
@@ -160,10 +177,10 @@ class DbConnection():
         """
         update_query = "UPDATE incidents SET {} = '{}' WHERE id = {} and \
                         type = '{}' RETURNING id".format(
-                                    update_key,
-                                    getattr(update_incident, update_key),
-                                    update_incident.id,
-                                    incident_type)
+            update_key,
+            getattr(update_incident, update_key),
+            update_incident.id,
+            incident_type)
 
         self.cursor.execute(update_query)
         returned_data = self.cursor.fetchone()

@@ -8,7 +8,8 @@ class ValidationHelpers():
         missing_keys = []
         for key in keys:
             if key not in data:
-                missing_keys.append('{} key missing'.format(key))
+                display_key = self.get_display_key(key)
+                missing_keys.append('{} key missing'.format(display_key))
         return missing_keys
 
     def is_of_type_string(self, data, keys):
@@ -16,7 +17,8 @@ class ValidationHelpers():
         bad_keys = []
         for key in keys:
             if type(data[key]) is not str:
-                bad_keys.append('{} has should be of type string'.format(key))
+                display_key = self.get_display_key(key)
+                bad_keys.append('{} has should be of type string'.format(display_key))
         return bad_keys
 
     def is_of_type_list(self, data, keys):
@@ -25,7 +27,8 @@ class ValidationHelpers():
 
         for media in sent_media:
             if type(data[media]) is not list:
-                media_errors.append('{} has should be in a list'.format(media))
+                display_key = self.get_display_key(key)
+                media_errors.append('{} has should be in a list'.format(display_media))
 
         return media_errors
 
@@ -50,7 +53,8 @@ class ValidationHelpers():
         empty_fields = []
         for key in keys:
             if len(data[key]) == 0:
-                empty_fields.append('{} is required'.format(key))
+                display_key = self.get_display_key(key)
+                empty_fields.append('{} is required'.format(display_key))
         return empty_fields
 
     def is_proper_incident_type(self, incident_type):
@@ -106,3 +110,19 @@ class ValidationHelpers():
         if not re.match(pattern, email):
             return 'email is wrong'.format(email)
 
+    def get_display_key(self, key):
+        display_key = key
+        if key == 'user_name':
+            display_key = 'User name'
+        elif key == 'password':
+            display_key = 'Password'
+        elif key == 'first_name':
+            display_key = 'First name'
+        elif key == 'last_name':
+            display_key = 'Last name'
+        elif key == 'email':
+            display_key = 'Email'
+        elif key == 'phone_number':
+            display_key = 'Phone Number'
+
+        return display_key

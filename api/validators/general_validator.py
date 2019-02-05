@@ -4,7 +4,7 @@ Module to handle input validations
 
 import re
 from flask import jsonify
-from api.models.db import DbConnection
+from api.database.engine import DbConnection
 from api.validators.validation_helper import ValidationHelpers
 
 db_services = DbConnection()
@@ -109,10 +109,6 @@ def validate_login(data):
     if errors:
         return errors
 
-    errors = (validate.key_exists(data, keys))
-    if errors:
-        return errors
-
     errors = (validate.is_of_type_string(data, keys))
     if errors:
         return errors
@@ -134,9 +130,9 @@ def is_modifiable(incident, user_id):
     if user is None:
         return 'authorization terminated'
     if user['isadmin'] is False:
-        if not self.is_owner(incident, user_id):
+        if not is_owner(incident, user_id):
             return 'incident belongs to another user'
-        if not incident['status'] == "pending":
+        if not incident.status == "pending":
             return 'incident no longer modifiable'
 
 
@@ -146,7 +142,7 @@ def is_owner(incident, user_id):
     Returns False if the user is not the incident creator
 
     '''
-    if incident['createdby'] != user_id:
+    if incident.createdby != user_id:
         return False
     return True
 

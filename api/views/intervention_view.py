@@ -22,11 +22,3 @@ def get_interventions():
 def get_intervention(incident_id):
 
     return incident_controller.get_incident(incident_type, incident_id)
-
-
-@app.route('/api/v1/interventions/<int:incident_id>', methods=['DELETE'])
-@jwt_required
-@admin_denied
-def delete_intervention(incident_id):
-
-    return incident_controller.delete_incident(incident_id)

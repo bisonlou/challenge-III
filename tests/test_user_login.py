@@ -2,7 +2,7 @@ import unittest
 import json
 from api import app, test_client
 from api.models.user_model import User
-from api.models.db import DbConnection
+from api.database.engine import DbConnection
 
 
 class TestUserView(unittest.TestCase):
@@ -34,7 +34,7 @@ class TestUserView(unittest.TestCase):
         """
         teardown test client
         """
-        self.db_services.delete_all_users()       
+        self.db_services.reset_database()      
 
     def test_login(self):
         """

@@ -1,7 +1,7 @@
 import unittest
 import json
 from api import app, test_client
-from api.models.db import DbConnection
+from api.database.engine import DbConnection
 
 
 class TestRedFlagView(unittest.TestCase):
@@ -84,55 +84,28 @@ class TestRedFlagView(unittest.TestCase):
             'status': 'pending',
             'images': ['photo_0979.jpg', 'photo_0094.jpg'],
             'videos': ['video_0002.mov']
-        }
-
-        red_flag_2 = {
-            'title': 'Magistrate',
-            'comment': 'Police officer at CPS Badge #162',
-            'location': '(-65.712557, -15.000182)',
-            'type': 'red-flag',
-            'status': 'pending',
-            'images': ['photo_0979.jpg'],
-            'videos': ['video_0002.mov']
-        }
-
-        self.test_client.post(
-            '/api/v1/incidents',
-            headers={'Authorization': 'Bearer ' +
-                     self.admin_token},
-            content_type='application/json',
-            data=json.dumps(red_flag_1)
-        )
+        }        
 
         self.test_client.post(
             '/api/v1/incidents',
             headers={'Authorization': 'Bearer ' +
                      self.non_admin_token},
             content_type='application/json',
-            data=json.dumps(red_flag_2)
+            data=json.dumps(red_flag_1)
         )
 
     def tearDown(self):
         """
-        teardown test client
+        teardown database
         """
-        self.db_services.delete_all_incidents()
-        self.db_services.delete_all_users()
+        self.db_services.reset_database()
 
     def test_add_proper_red_flag(self):
         """
         Test adding a red flag with expected keys
         Expect 201
         """
-        red_flag = {
-            'title': 'Police Officer',
-            'comment': 'Police officer at CPS Badge #162',
-            'location': '(-65.712557, -15.000182)',
-            'type': 'red-flag',
-            'status': 'pending',
-            'images': ['photo_0912.jpg'],
-            'videos': ['video_0102.mov']
-        }
+        red_flag = self.create_incident_data()
 
         response = self.test_client.post(
             '/api/v1/incidents',
@@ -147,17 +120,11 @@ class TestRedFlagView(unittest.TestCase):
 
     def test_add_bad_red_flag(self):
         """
-        Test adding a red flag without a title
+        Test adding a red flag without empty title
         Expect 400
         """
-        red_flag = {
-            'comment': 'Took a bribe',
-            'location': '(-65.712557, -15.000182)',
-            'type': 'red-flag',
-            'status': 'pending',
-            'images': ['photo_0979.jpg'],
-            'videos': ['mov_0987.mp4']
-        }
+        data = {'title': ''}
+        red_flag = self.create_incident_data(**data)
 
         response = self.test_client.post(
             '/api/v1/incidents',
@@ -194,16 +161,95 @@ class TestRedFlagView(unittest.TestCase):
         message = json.loads(response.data)
 
         self.assertEqual(message['status'], 200)
-   
+
     def test_get_non_existent_red_flag(self):
         """
         Test getting one red flag that does not exist
         Expect 404
         """
         response = self.test_client.get(
-            '/api/v1/redflags/1',
+            '/api/v1/redflags/100',
             headers={'Authorization': 'Bearer ' +
-                     self.admin_token})
+                     self.non_admin_token})
         message = json.loads(response.data)
 
         self.assertEqual(message['status'], 404)
+
+    def test_patch_incident_comment(self):
+        """
+        Test gpatching an incidents comment
+        Expect 200
+        """
+        red_flag = self.create_incident_data()
+        response = self.test_client.patch(
+            '/api/v1/incidents/1/comment',
+            headers={'Authorization': 'Bearer ' +
+                     self.non_admin_token
+                     },
+            content_type='application/json',
+            data=json.dumps(red_flag))
+
+        message = json.loads(response.data)
+        self.assertEqual(message['status'], 200)
+
+    def test_patch_incident_location(self):
+        """
+        Test patching an incidents location
+        Expect 200
+        """
+        red_flag = self.create_incident_data()
+
+        response = self.test_client.patch(
+            '/api/v1/incidents/1/location',
+            headers={'Authorization': 'Bearer ' +
+                     self.non_admin_token
+                     },
+            content_type='application/json',
+            data=json.dumps(red_flag))
+
+        message = json.loads(response.data)
+        self.assertEqual(message['status'], 200)
+
+    def test_put_incident(self):
+        """
+        Test putting an incidents location
+        Expect 200
+        """
+        red_flag = self.create_incident_data()
+
+        response = self.test_client.put(
+            '/api/v1/incidents/1',
+            headers={'Authorization': 'Bearer ' +
+                     self.non_admin_token
+                     },
+            content_type='application/json',
+            data=json.dumps(red_flag))
+
+        message = json.loads(response.data)
+        self.assertEqual(message['status'], 200)
+
+    def test_delete_incident(self):
+        """
+        Test deleting an incidents location
+        Expect 200
+        """
+
+        response = self.test_client.delete(
+            '/api/v1/incidents/1',
+            headers={'Authorization': 'Bearer ' +
+                     self.non_admin_token
+                     })
+
+        message = json.loads(response.data)
+        self.assertEqual(message['status'], 200)
+
+    def create_incident_data(self, **kwags):
+        return {
+            'title': kwags.get('title', 'title'),
+            'comment': kwags.get('comment', 'title'),
+            'location': kwags.get('location', '(00.712557, 00.0000)'),
+            'type':  kwags.get('type', 'red-flag'),
+            'status':  kwags.get('status', 'pending'),
+            'images': kwags.get('images', ['photo_0.jpg']),
+            'videos':  kwags.get('videos', ['video_0002.mov'])
+        }

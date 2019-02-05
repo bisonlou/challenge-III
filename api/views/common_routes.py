@@ -88,3 +88,10 @@ def patch_incident_status(incident_id):
     """
 
     return incident_controller.patch_incident(incident_id, 'status')
+
+@app.route('/api/v1/incidents/<int:incident_id>', methods=['DELETE'])
+@jwt_required
+@admin_denied
+def delete_red_flag(incident_id):
+
+    return incident_controller.delete_incident(incident_id)

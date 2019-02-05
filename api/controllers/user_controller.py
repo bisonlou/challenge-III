@@ -1,7 +1,7 @@
 from api import app
 from datetime import datetime
 from api.models.user_model import User
-from api.models.db import DbConnection
+from api.database.engine import DbConnection
 from flask import jsonify, abort, request
 from api.utility.authenticator import create_access_token
 from werkzeug.security import (
@@ -33,8 +33,8 @@ class UserController():
             return jsonify({'status': 400, 'errors': errors}), 400
 
         if is_duplicate_email(data['email']):
-            return jsonify({'status': 409, 'errors':
-                            'Conflict: user already registered'}), 409
+            return jsonify({'status': 409, 'errors': [
+                            'Conflict: user already registered']}), 409
 
         hashed_password = generate_password_hash(
             data['password'], method='sha256')
@@ -64,8 +64,8 @@ class UserController():
         user = db_services.get_user_by_email(data['email'])
 
         if user is None:
-            return jsonify({'status': 401, 'error':
-                            'incorrect credentials'}), 401
+            return jsonify({'status': 401, 'errors':
+                            ['incorrect credentials']}), 401
 
         if check_password_hash(user['password'], data['password']):
             access_token = create_access_token(user['id'], user['isadmin'])

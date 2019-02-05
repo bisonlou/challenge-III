@@ -21,11 +21,3 @@ def get_incidents():
 def get_red_flag(incident_id):
 
     return incident_controller.get_incident(incident_type, incident_id)
-
-
-@app.route('/api/v1/redflags/<int:incident_id>', methods=['DELETE'])
-@jwt_required
-@admin_denied
-def delete_red_flag(incident_id):
-
-    return incident_controller.delete_incident(incident_type, incident_id)

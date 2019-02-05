@@ -28,7 +28,7 @@ class User():
     @property
     def is_admin(self):
         return self._is_admin
-         
+
     @property
     def user_name(self):
         return self._user_name
@@ -51,11 +51,4 @@ class User():
 
     @property
     def date_registered(self):
-        return self._date_registered    
-
-
-
-       
-
-    
-        
+        return self._date_registered

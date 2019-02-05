@@ -5,7 +5,7 @@ Module to handle incident CRUD operations
 from api import app
 from datetime import datetime
 from api.models.user_model import User
-from api.models.db import DbConnection
+from api.database.engine import DbConnection
 from api.models.incident_model import Incident
 from api.utility.authenticator import get_identity
 from api.validators.general_validator import(
@@ -67,9 +67,13 @@ class IncidentController():
         user_id = get_identity()
 
         incidents = db_services.get_all_incidents(
-            user_id, incident_type)
+                    user_id, incident_type)
 
-        return jsonify({'status': 200, 'data': [incidents]})
+        incident_totals = db_services.get_user_totals(
+                            user_id, incident_type)
+
+        return jsonify({'status': 200, 'data': [incidents],
+                       'totals': incident_totals})
 
     def get_incident(self, incident_type, incident_id):
         '''
@@ -120,7 +124,7 @@ class IncidentController():
 
         return jsonify({
             'status': 200,
-            'data': [updated_incident]
+            'data': [updated_incident.to_dict()]
             })
 
     def patch_incident(self, incident_id, update_key):
@@ -147,7 +151,7 @@ class IncidentController():
             return jsonify({'status': 404, 'errors':
                             'incident not found'}), 404
 
-        incident_type = existing_incident['type']
+        incident_type = existing_incident.type
 
         errors = is_modifiable(existing_incident, user_id)
         if errors:
@@ -156,7 +160,7 @@ class IncidentController():
         update_incident = Incident(**data)
 
         incident = db_services.patch_incident(
-            update_incident, incident_type, update_key)
+            update_incident, update_key)
 
         if incident is None:
             return jsonify({'status': 401, 'data':
@@ -196,9 +200,9 @@ class IncidentController():
         if errors:
             return jsonify({'status': 403, 'error': errors}), 403
 
-        incident_type = existing_incident['type']
+        incident_type = existing_incident.type
 
-        deleted_id = db_services.delete_incident(existing_incident['id'])
+        deleted_id = db_services.delete_incident(existing_incident.id)
         if deleted_id is None:
             return jsonify({'status': 404, 'error':
                             'Incident doesnt exist'}), 404

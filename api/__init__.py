@@ -1,10 +1,12 @@
 from flask import Flask
+from flask_cors import CORS
 
 app = Flask(__name__)
+CORS(app)
 
 test_client = app.test_client()
 
-import api.models.db
+import api.database.engine
 import api.views.user_view
 import api.views.red_flag_view
 import api.views.common_routes

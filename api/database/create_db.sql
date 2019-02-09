@@ -12,14 +12,7 @@ CREATE TABLE IF NOT EXISTS public.users
     dteregistered text COLLATE pg_catalog."default" NOT NULL,
     isadmin boolean NOT NULL,
     CONSTRAINT users_pkey PRIMARY KEY (id)
-)
-WITH (
-    OIDS = FALSE
-)
-TABLESPACE pg_default;
-
-ALTER TABLE public.users
-    OWNER to postgres;
+);
 
 
 
@@ -38,14 +31,7 @@ CREATE TABLE IF NOT EXISTS public.incidents
         REFERENCES public.users (id) MATCH SIMPLE
         ON UPDATE CASCADE
         ON DELETE CASCADE
-)
-WITH (
-    OIDS = FALSE
-)
-TABLESPACE pg_default;
-
-ALTER TABLE public.incidents
-    OWNER to postgres;
+);
 
 
 
@@ -59,14 +45,7 @@ CREATE TABLE IF NOT EXISTS public.images
         REFERENCES public.incidents (id) MATCH SIMPLE
         ON UPDATE CASCADE
         ON DELETE CASCADE
-)
-WITH (
-    OIDS = FALSE
-)
-TABLESPACE pg_default;
-
-ALTER TABLE public.images
-    OWNER to postgres;
+);
 
 
 
@@ -80,11 +59,4 @@ CREATE TABLE IF NOT EXISTS public.videos
         REFERENCES public.incidents (id) MATCH SIMPLE
         ON UPDATE CASCADE
         ON DELETE CASCADE
-)
-WITH (
-    OIDS = FALSE
-)
-TABLESPACE pg_default;
-
-ALTER TABLE public.videos
-    OWNER to postgres;
+);

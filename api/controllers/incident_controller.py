@@ -162,7 +162,6 @@ class IncidentController():
 
         incident = db_services.patch_incident(
             update_incident, update_key)
-
         success_response = {
             'id': incident_id,
             'message':
@@ -175,11 +174,7 @@ class IncidentController():
         user_id = get_identity()      
         APP_ROOT = os.path.dirname(os.path.abspath('api/'))
         upload_folder = os.path.join(APP_ROOT, os.environ['UPLOAD_FOLDER'])
-        
-        # if not request.files['image']:
-        #     return jsonify({'status': 400, 'errors':
-        #                     ['images not found']}), 400
-                            
+                                    
         incident = db_services.get_incident(incident_id)
         if not incident:
             return jsonify({'status': 404, 'errors':
@@ -208,7 +203,6 @@ class IncidentController():
             }
 
         return jsonify({'status': 201, 'data': [success_response]}), 201
-
 
     def delete_incident(self, incident_id):
         '''

@@ -259,7 +259,7 @@ class DbConnection():
 
         if len(constraints) > 0:
             query = query + ' WHERE '            
-            query = self.append_where_clauses(query, constraints, False)            
+            query = self.append_where_clauses(query, constraints, False)     
 
         return query
 

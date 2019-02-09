@@ -87,7 +87,6 @@ def add_image(incident_id):
     
     return incident_controller.patch_incident_image(incident_id)
 
-
 @app.route('/api/v1/incidents/<int:incident_id>/status',
            methods=['PATCH'])
 @jwt_required

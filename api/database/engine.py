@@ -120,8 +120,8 @@ class DbConnection():
     def get_incident(self, incident_id):
         '''
         Function to get just one incident
-        Requires a user id to check user type
-        Returns a uder dictionary
+        Requires a user id to check for user rights
+        Returns a user dictionary
         '''
         incidents_query = self.select_query_builder('*', 'incidents', ['id'])
         data = (incident_id,)
@@ -182,7 +182,23 @@ class DbConnection():
 
             return updated_incident
 
+    def add_incident_image(self, incident_id, filename):
+        '''
+        Function to add an image to an incident
+        Requires an incident id and the file name
+        Returns a the image record id
+        '''
+        query = self.insert_query_builder(['incident', 'filename'], 'images')
+        self.cursor.execute(query, (incident_id, filename))
+
+        return self.cursor.fetchone()['id']
+
     def delete_incident(self, incident_id):
+        '''
+        Function to delete one incident
+        Requires a an incident id
+        Returns the deleted incidents id
+        '''
         delete_incidents_query = self.delete_query_builder(
                                 'incidents',
                                 ['id'])
@@ -228,7 +244,7 @@ class DbConnection():
             query = self.insert_query_builder(fields, table)
             self.cursor.execute(query, values)
 
-    def select_query_builder(self, fields, table, contraints):
+    def select_query_builder(self, fields, table, constraints):
         ''' Function to concatenate select qurey strings and parameters'''
         query = 'SELECT '
 
@@ -241,16 +257,9 @@ class DbConnection():
                 query = query + field
         query = query + ' FROM ' + table
 
-        if len(contraints) > 0:
-            query = query + ' WHERE '
-
-            i = 1
-            for constraint in contraints:
-                if i < len(contraints):
-                    query = query + constraint + ' = %s AND '
-                    i += 1
-                else:
-                    query = query + constraint + ' = %s;'
+        if len(constraints) > 0:
+            query = query + ' WHERE '            
+            query = self.append_where_clauses(query, constraints, False)            
 
         return query
 
@@ -285,30 +294,28 @@ class DbConnection():
                 j += 1
             else:
                 query = query + field + ' = %s'
-        query = query + ' WHERE '
 
-        i = 0
-        for constraint in constraints:
-            if i + 1 < len(constraints):
-                query = query + constraint + ' = %s AND '
-                i += 1
-            else:
-                query = query + constraint + ' = %s'
-        query = query + ' RETURNING id'
+        query = query + ' WHERE '
+        query = self.append_where_clauses(query, constraints, True)
 
         return query
 
     def delete_query_builder(self, table, constraints):
         ''' Function to concatenate delete qurey strings and parameters'''
         query = 'DELETE FROM ' + table + ' WHERE '
+        query = self.append_where_clauses(query, constraints, True)
+
+        return query
+
+    def append_where_clauses(self, query, constraints, return_id):
         i = 1
         for constraint in constraints:
-            if i + 1 < len(constraints):
+            if i < len(constraints):
                 query = query + constraint + ' = %s AND '
                 i += 1
             else:
-                query = query + constraint + ' = %s'
-
-        query = query + ' RETURNING id;'
-
+                if return_id:
+                    query = query + constraint + ' = %s  RETURNING id;'
+                else:
+                    query = query + constraint + ' = %s;'        
         return query

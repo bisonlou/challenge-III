@@ -77,6 +77,17 @@ def patch_incident_comment(incident_id):
 
     return incident_controller.patch_incident(incident_id, 'comment')
 
+@app.route('/api/v1/incidents/<int:incident_id>/addImage', methods=['PATCH'])
+@jwt_required
+@admin_denied
+def add_image(incident_id):
+    """
+    Endpoint to add incident image
+    """
+    
+    return incident_controller.patch_incident_image(incident_id)
+
+
 @app.route('/api/v1/incidents/<int:incident_id>/status',
            methods=['PATCH'])
 @jwt_required

@@ -7,7 +7,6 @@ from api.models.incident_model import Incident
 class DbConnection():
 
     def __init__(self):
-        self.db_name = 'ireporter'
 
         try:
             self.connection = psycopg2.connect(environ.get('URI'))

@@ -42,7 +42,9 @@ class DbConnection():
         return self.get_user('email', login_email)
 
     def get_user(self, key, value):
-        select_query = self.select_query_builder('*', 'users', [key])
+        select_query = self.select_query_builder(
+                         ['*'],
+                         'users', [key])
 
         data = (value,)
         self.cursor.execute(select_query, data)
@@ -50,6 +52,18 @@ class DbConnection():
 
         if user:
             return user
+
+    def get_users(self):
+        select_query = self.select_query_builder(
+                         ['username', 'email', 'firstname', 'lastname',
+                          'othernames', 'phonenumber', 'dteregistered', 'isadmin'],
+                         'users', [])
+
+        self.cursor.execute(select_query)
+        users = self.cursor.fetchall()
+
+        if users:
+            return users
 
     def insert_incident(self, incident):
         fields = ['createdOn', 'title', 'comment', 'type',

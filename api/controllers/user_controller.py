@@ -3,7 +3,10 @@ from datetime import datetime
 from api.models.user_model import User
 from api.database.engine import DbConnection
 from flask import jsonify, abort, request
-from api.utility.authenticator import create_access_token
+from api.utility.authenticator import (
+    create_access_token,
+    get_identity,
+    verify_is_admin)
 from werkzeug.security import (
     generate_password_hash,
     check_password_hash)
@@ -44,8 +47,13 @@ class UserController():
 
         new_user = User(**data)
         user = db_services.add_user(new_user)
+        del user['password']
 
-        success_response = {'user': user, 'message': 'User created'}
+        access_token = create_access_token(user['id'], user['isadmin'])
+        success_response = {'user': user,
+                            'message': 'User created',
+                            'access_token': access_token}
+        
         return jsonify({'status': 201, 'data': [success_response]}), 201
 
     def login(self):
@@ -69,7 +77,29 @@ class UserController():
 
         if check_password_hash(user['password'], data['password']):
             access_token = create_access_token(user['id'], user['isadmin'])
+            del user['password']
+
             success_response = {'user': user,
                                 'access_token': access_token}
             return jsonify({'status': 200, 'data': [success_response]}), 200
-        abort(401)
+
+        return jsonify({'status': 401, 'errors': ['Unauthorised']}), 401     
+
+    def get_users(self):
+        """
+        Function to login a user in case of anon admin
+        Adn get all users in case of an admin
+        The function a list of users
+        """
+        user_id = get_identity()
+        is_admin = verify_is_admin()
+        users = ""
+
+        if is_admin is True:
+            users = db_services.get_users()
+        else:
+            users = db_services.get_user_by_id(user_id)
+    
+        return jsonify({'status': 200, 'data': [users]}), 200
+        
+    

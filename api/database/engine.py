@@ -67,10 +67,10 @@ class DbConnection():
 
     def insert_incident(self, incident):
         fields = ['createdOn', 'title', 'comment', 'type',
-                  'createdby', 'location', 'status']
+                  'createdby', 'latitude', 'longitude', 'status']
         values = (incident.createdon, incident.title, incident.comment,
-                  incident.type, incident.createdby, incident.location,
-                  incident.status)
+                  incident.type, incident.createdby, incident.latitude,
+                  incident.longitude, incident.status)
 
         new_incident = self.insert_query_builder(fields, 'incidents')
         self.cursor.execute(new_incident, values)
@@ -160,11 +160,12 @@ class DbConnection():
         '''Function to update an incident'''
 
         update_query = self.update_query_builder(
-                        ['title', 'location', 'comment'],
+                        ['title', 'latitude', 'longitude', 'comment'],
                         'incidents',
                         ['id'])
         values = (update_incident.title,
-                  update_incident.location,
+                  update_incident.latitude,
+                  update_incident.longitude,
                   update_incident.comment,
                   update_incident.id)
 
@@ -182,9 +183,18 @@ class DbConnection():
         Updates an incident field
         Returns the updated incident"
         """
-        update_query = self.update_query_builder(
-                        [update_field], 'incidents', ['id'])
-        values = (getattr(update_incident, update_field), update_incident.id)
+        update_query = ""
+        values = ""
+
+        if update_field == 'location':
+            update_query = self.update_query_builder(
+                        ['latitude', 'longitude'], 'incidents', ['id'])
+            values = (update_incident.latitude, update_incident.longitude,
+                      update_incident.id)
+        else:
+            update_query = self.update_query_builder(
+                            [update_field], 'incidents', ['id'])
+            values = (getattr(update_incident, update_field), update_incident.id)
 
         self.cursor.execute(update_query, values)
         returned_data = self.cursor.fetchone()

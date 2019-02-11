@@ -15,7 +15,6 @@ CREATE TABLE IF NOT EXISTS public.users
 );
 
 
-
 CREATE TABLE IF NOT EXISTS public.incidents
 (
     id SERIAL,
@@ -24,7 +23,8 @@ CREATE TABLE IF NOT EXISTS public.incidents
     comment text COLLATE pg_catalog."default" NOT NULL,
     type character varying(25) COLLATE pg_catalog."default",
     createdby integer,
-    location character varying(50) COLLATE pg_catalog."default" NOT NULL,
+    latitude REAL NOT NULL,
+    longitude REAL NOT NULL,
     status character varying(20) COLLATE pg_catalog."default" NOT NULL,
     CONSTRAINT incidents_pkey PRIMARY KEY (id),
     CONSTRAINT incidents_createdby_fkey FOREIGN KEY (createdby)

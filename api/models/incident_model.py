@@ -10,7 +10,8 @@ class Incident():
         self._createdon = kwags.get('createdon', '')
         self._comment = kwags.get('comment', '')
         self._createdby = kwags.get('createdby', '')
-        self._location = kwags.get('location', '')
+        self._latitude = kwags.get('latitude', 0.0)
+        self._longitude = kwags.get('longitude', 0.0)
         self._status = kwags.get('status', '')
         self._type = kwags.get('type', '')
         self._images = []
@@ -43,8 +44,12 @@ class Incident():
         return self._comment
 
     @property
-    def location(self):
-        return self._location
+    def latitude(self):
+        return self._latitude
+
+    @property
+    def longitude(self):
+        return self._longitude
 
     @property
     def videos(self):
@@ -74,9 +79,13 @@ class Incident():
     def comment(self, comment):
         self._comment = comment
 
-    @location.setter
-    def location(self, location):
-        self._location = location
+    @latitude.setter
+    def latitude(self, latitude):
+        self._latitude = latitude
+
+    @longitude.setter
+    def longitude(self, longitude):
+        self._longitude = longitude
 
     @images.setter
     def images(self, images):
@@ -96,7 +105,8 @@ class Incident():
                     createdby=self._createdby,
                     title=self._title,
                     comment=self._comment,
-                    location=self._location,
+                    latitude=self._latitude,
+                    longitude=self._longitude,
                     type=self._type,
                     status=self._status,
                     images=self._images,

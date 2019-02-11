@@ -18,15 +18,17 @@ def validate_incident(data):
     Returns True on success otherwise False
 
     '''
-    keys = ['title', 'comment', 'location', 'type', 'status']
+    keys = ['title', 'comment', 'latitude', 'longitude', 'type', 'status']
     errors = validate.key_exists(data, keys)
     if errors:
         return errors
 
+    keys = ['title', 'comment', 'type', 'status']
     errors = validate.key_value_not_empty(data, keys)
     if errors:
         return errors
 
+    keys = ['title', 'comment', 'type', 'status']
     errors = validate.is_of_type_string(data, keys)
     if errors:
         return errors

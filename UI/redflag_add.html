@@ -20,17 +20,20 @@
                 <div id="branding">
                     <h1><span class="highlight">i</span>Reporter</h1>
                 </div>
-            </div>
-            <nav>
-                <ul>
-                    <li class="current"><a href="./index.html">Home</a></li>
-                    <li id="account-circle"><a href="./login.html">Hello bisonlou</a></li>
-                    <li id="account-circle"><a href="./admin.html">Admin</a></li>
-                </ul>
-            </nav>
+                <nav>
+                    <ul>
+                        <li class="current"><a href="./index.html">Home</a></li>
+                    </ul>
+                </nav>
+            </div>            
         </header>
     </div>
     <div class="container">
+        <div class="alert-box" id="alert-box">
+            <p>Red flag created succesfully</p>
+        </div>
+        <div class="error-box" id="error-box">
+            </div>
         <div class="flag-box">
             <div class="left">
                 <p>Title</p>
@@ -45,16 +48,15 @@
             </div>
             <div class="middle">
                 <p>Image evidence</p>
-                <input type="file">
+                <input type="file" id="image" multiple onchange="displayImages(this.files); return false;" />
                 <div class="media-table">
-                    <table>
-
+                    <table id="images_table">
                     </table>
                 </div>
             </div>
             <div class="right">
                 <p>Video evidence</p>
-                <input type="file">
+                <input type="file" disabled>
                 <div class="media-table">
                     <table>
 
@@ -64,7 +66,7 @@
         </div>
     </div>
     <div class="flag-box-submit">
-        <input type="submit" onclick="postIncident('red-flag')" value="Submit" >
+        <input type="submit" onclick="postIncident('red-flag');" value="Submit" >
     </div>
 </body>
 

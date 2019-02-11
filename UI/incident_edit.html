@@ -20,14 +20,13 @@
                 <div id="branding">
                     <h1><span class="highlight">i</span>Reporter</h1>
                 </div>
+                <nav>
+                    <ul>
+                        <li class="current"><a href="./index.html">Home</a></li>
+                    </ul>
+                </nav>
             </div>
-            <nav>
-                <ul>
-                    <li class="current"><a href="./index.html">Home</a></li>
-                    <li id="account-circle"><a href="./login.html">Hello bisonlou</a></li>
-                    <li id="account-circle"><a href="./admin.html">Admin</a></li>
-                </ul>
-            </nav>
+            
         </header>
     </div>
     <div class="container">
@@ -46,15 +45,15 @@
             <div class="middle">
                 <p>Image evidence</p>
                 <input type="file">
-                <div class="media-table">
-                    <table>
+                <div class="media-table" >
+                    <table id="images-table">
 
                     </table>
                 </div>
             </div>
             <div class="right">
                 <p>Video evidence</p>
-                <input type="file">
+                <input type="file" disabled>
                 <div class="media-table">
                     <table>
 
@@ -64,7 +63,7 @@
         </div>
     </div>
     <div class="flag-box-submit">
-        <input type="submit" value="Submit Changes">
+        <input type="submit" onclick="putIncident()" value="Submit Changes">
     </div>
     </div>
 

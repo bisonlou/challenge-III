@@ -15,21 +15,20 @@
 
 </head>
 
-<body onload="getRedflags(); getInterventions();">
+<body onload="getIndexData();">
     <div class="bg-image">
         <header id="main-header">
             <div class="container">
                 <div id="branding">
                     <h1><span class="highlight">i</span>Reporter</h1>
                 </div>
-            </div>
-            <nav>
-                <ul>
-                    <li class="current"><a href="./index.html">Home</a></li>   
-                    <li><a href="./login.html">Hello bisonlou</a></li>
-                    <li ><a href="./admin.html">Admin</a></li>
-                </ul>
-            </nav>
+                <nav>
+                    <ul>
+                        <li id="account-name"></li>
+                        <li id="sign-out"><a href="#">sign out</a></li>
+                    </ul>
+                </nav>
+            </div>           
         </header>
 
         <div class="container">
@@ -39,33 +38,30 @@
                         <table class="flag-table">
                             <tr>
                                 <td>
-                                    <label id="card-label">Total red flags</label>
+                                    <label class="card-label" >Total red flags</label>
                                 </td>
                                 <td>
-                                    <label id="card-value">3</label>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <label id="card-label">Escalated red flags</label>
-                                </td>
-                                <td>
-                                    <label id="card-value">0</label>
+                                    <label class="card-value" id="total-redflags"></label>
                                 </td>
                             </tr>
                             <tr>
                                 <td>
-                                    <label id="card-label">Rejected red flags</label>
+                                    <label class="card-label">Pending red flags</label>
                                 </td>
                                 <td>
-                                    <label id="card-value">1</label>
+                                    <label class="card-value" id="pending-redflags"></label>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <label class="card-label">Rejected red flags</label>
+                                </td>
+                                <td>
+                                    <label class="card-value" id="rejected-redflags"></label>
                                 </td>
                             </tr>
                         </table>
-                        <form action="./redflag_add.html">
-                            <button type="submit" class="button-add"></button>
-                        </form>
-                        
+                            <button type="submit" class="button-add" onclick="navigate_to('redflag_add.html')"></button>
                     </div>
                 </div>
 
@@ -73,26 +69,26 @@
                     <table class="flag-table">
                         <tr>
                             <td>
-                                <label id="card-label">Total interventions</label>
+                                <label class="card-label">Total interventions</label>
                             </td>
                             <td>
-                                <label id="card-value">5</label>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <label id="card-label">Escalated interventions</label>
-                            </td>
-                            <td>
-                                <label id="card-value">2</label>
+                                <label class="card-value" id="total-interventions"></label>
                             </td>
                         </tr>
                         <tr>
                             <td>
-                                <label id="card-label">Rejected interventios</label>
+                                <label class="card-label">Pending interventions</label>
                             </td>
                             <td>
-                                <label id="card-value">1</label>
+                                <label class="card-value" id="pending-interventions"></label>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <label class="card-label">Rejected interventios</label>
+                            </td>
+                            <td>
+                                <label class="card-value" id="rejected-interventions"></label>
                             </td>
                         </tr>
                     </table>
@@ -108,7 +104,7 @@
     <div class="container">
         <div class="tables">
             <div class="redflag-table">
-                <label class="table-header red">Your red flags</label>
+                <label class="table-header red">My red flags</label>
                 <table id="redflag-table">
                     <thead>
                         <tr>
@@ -124,7 +120,7 @@
                 </table>
             </div>
             <div class="intervention-table">
-                <label class="table-header intervention">Your interventions</label>
+                <label class="table-header intervention">My interventions</label>
                 <table id="intervention-table">
                     <thead>
                         <tr>

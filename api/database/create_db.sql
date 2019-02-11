@@ -23,8 +23,8 @@ CREATE TABLE IF NOT EXISTS public.incidents
     comment text COLLATE pg_catalog."default" NOT NULL,
     type character varying(25) COLLATE pg_catalog."default",
     createdby integer,
-    latitude REAL NOT NULL,
-    longitude REAL NOT NULL,
+    latitude REAL,
+    longitude REAL,
     status character varying(20) COLLATE pg_catalog."default" NOT NULL,
     CONSTRAINT incidents_pkey PRIMARY KEY (id),
     CONSTRAINT incidents_createdby_fkey FOREIGN KEY (createdby)

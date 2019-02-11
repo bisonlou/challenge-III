@@ -367,7 +367,7 @@ function displayAlert(){
  }
 
 function navigate_to(page){
-  window.location.href = "https://bisonlou.github.io/ireporter/UI/" + page ;
+  window.location.href = "https://bisonlou.github.io/challenge-III/UI/" + page ;
   // window.location.href = "http://localhost/iReporter/" + page ;
 }
 

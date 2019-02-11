@@ -225,7 +225,7 @@ table th {
 
 .login-box input {
     width:100%; 
-    margin-bottom: 5px;
+    margin-bottom: 35px;
     outline:none;
     border:none;    
     height: 40px;
@@ -276,6 +276,7 @@ table th {
 .register-box input {
     width:100%; 
     outline:none;
+    margin-bottom: 20px;
     border:none;
     color: burlywood;
     font-size: 14px;
@@ -603,6 +604,15 @@ border-spacing: 0px;
         float: none;
         width: 95%;
     }
+
+    .welcome-box input[type=submit] {
+        margin-top: 20px;        
+    }
+
+    .welcome-box p {
+        font-size: 15px;       
+    }
+  
   
 }
 
@@ -762,6 +772,45 @@ border-spacing: 0px;
 
     .register-box {
         margin: auto;
-        width:80%;
+        width:80%;        
     }
+
+    .welcome-box{
+        height: 280px;
+    }
+
+    .welcome-box p {     
+        line-height: 1.2em;
+        font-size:16px;   
+    }
+
+    .login-box{     
+        height:280px;   
+    }
+
+    .login-box input{     
+        margin-bottom: 10px;  
+    }
+
+
+    .black-box {
+        width:90%;
+        height: 280px;
+        padding: 20px;
+        vertical-align: middle;
+    }
+
+    .black-box h1{
+        font-size: 1.8em;
+    }
+
+    .welcome-box input[type=submit] {
+        width: 80%;
+        margin-top: 25px;
+    }
+
+    .welcome-box #second-par{
+        display: none;
+    }
+       
 }

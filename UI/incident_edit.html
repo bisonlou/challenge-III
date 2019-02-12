@@ -9,7 +9,9 @@
     <meta name="viewport" content="width=device-width">
     <!--  CSS -->
     <link href="./css/style.css" rel="stylesheet">
+    <link rel="icon" href="./images/megaphone.png" sizes="32x32" type="image/png">
     <script src="./js/scripts.js" type="text/javascript"></script>
+    <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyC4RJsZOxeXRxVFlU9fDExedVhrUjjXGi4&callback=initMap"></script>
 
 </head>
 
@@ -23,48 +25,45 @@
                 <nav>
                     <ul>
                         <li class="current"><a href="./index.html">Home</a></li>
+                        <li id="sign-out"><a href="#" onclick="logout();">sign out</a></li>
                     </ul>
                 </nav>
             </div>
-            
+
         </header>
     </div>
     <div class="container">
-        <div action="home.html" class="flag-box">
+            <div class="alert-box" id="alert-box">
+                    <p>Incident edited succesfully</p>
+                </div>
+                <div class="error-box" id="error-box"></div>
+        <div class="flag-box">
             <div class="left">
-                <p>Title</p>
                 <input type="text" placeholder="Title" id="title">
-                <p>Comment</p>
-                <textarea width="100px" height="300px" id="comment">Describe incident...</textarea>
+                <textarea id="comment" cols="100" rows="5" style="margin: 10px;" placeholder="Describe incident..."></textarea>
                 <p>Location</p>
-                <div class="form-group">
-                    <input type="text" disabled="disabled">
-                    <button type="button">Get coordinates</button>
-                </div>
-            </div>
-            <div class="middle">
-                <p>Image evidence</p>
-                <input type="file">
-                <div class="media-table" >
-                    <table id="images-table">
-
-                    </table>
-                </div>
+                <div id="map"></div>
             </div>
             <div class="right">
+                <p>Image evidence</p>
+                <input type="file" id="image" multiple onchange="displayImages(this.files); return false;" />
+                <div class="media-table">
+                    <table id="images_table">
+                    </table>
+                </div>
+
                 <p>Video evidence</p>
                 <input type="file" disabled>
                 <div class="media-table">
-                    <table>
+                    <table id="images_table">
 
                     </table>
                 </div>
             </div>
         </div>
-    </div>
-    <div class="flag-box-submit">
-        <input type="submit" onclick="putIncident()" value="Submit Changes">
-    </div>
+        <div class="flag-box-submit">
+            <input type="submit" onclick="putIncident()" value="Submit Changes">
+        </div>
     </div>
 
     </div>

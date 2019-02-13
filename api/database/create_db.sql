@@ -33,13 +33,12 @@ CREATE TABLE IF NOT EXISTS public.incidents
         ON DELETE CASCADE
 );
 
-INSERT INTO users ( username, email, password, firstname,
- lastname, othernames, phonenumber, dteregistered, isadmin)
- VALUES 
-('bison', 'bisonlou@gmail.com',
+INSERT INTO users  ( username, email, password, firstname,lastname, othernames,
+ phonenumber, dteregistered, isadmin)
+SELECT 'bison', 'bisonlou@gmail.com',
 'sha256$a8HCuuXl$7f933b02fa157f5c3faa17950bac0aced460cab2700ca7017c56d987b1ba918c',
-'Innocent', 'Lou', '','07553669897','2019-01-01', True ) 
-ON CONFLICT (email) DO NOTHING;
+'Innocent', 'Lou', '','07553669897','2019-01-01', True
+WHERE NOT EXISTS ( SELECT id FROM users WHERE email = 'bisonlou@gmail.com');
 
 
 CREATE TABLE IF NOT EXISTS public.images

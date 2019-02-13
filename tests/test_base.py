@@ -9,7 +9,7 @@ class TestBase():
     def create_user_data(self, **kwags):
         return {
             'user_name': kwags.get('user_name', 'bison'),
-            'email': kwags.get('email', 'bisonlou@gmail.com'),
+            'email': kwags.get('email', 'bisonlou@ireporter.com'),
             'first_name': kwags.get('first_name', 'bison'),
             'last_name':  kwags.get('last_name', 'lou'),
             'phone_number':  kwags.get('phone_number', '0753669897'),

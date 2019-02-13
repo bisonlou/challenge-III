@@ -24,7 +24,7 @@ class TestUserView(unittest.TestCase):
         """
         Test registering a user successfuly
         """
-        credentials = {'email': 'bisonlou@gmail.com',
+        credentials = {'email': 'bisonlou@ireporter.com',
                        'password': 'Pa$$word123'}
 
         response = base.login_user(credentials)
@@ -34,7 +34,7 @@ class TestUserView(unittest.TestCase):
         """
         Test loging in without specifying a password
         """
-        credentials = {'email': 'bisonlou@gmail.com'}
+        credentials = {'email': 'bisonlou@ireporter.com'}
 
         response = base.login_user(credentials)
         self.assertEqual(response.status_code, 400)
@@ -53,7 +53,7 @@ class TestUserView(unittest.TestCase):
         """
         Test login with empty password
         """
-        credentials = {'email': 'bisonlou@gmail.com',
+        credentials = {'email': 'bisonlou@ireporter.com',
                        'password': ''}
 
         response = base.login_user(credentials)
@@ -63,7 +63,7 @@ class TestUserView(unittest.TestCase):
         """
         Test login with wrong password
         """
-        credentials = {'email': 'bisonlou@gmail.com',
+        credentials = {'email': 'bisonlou@ireporter.com',
                        'password': 'Password123'}
 
         response = base.login_user(credentials)

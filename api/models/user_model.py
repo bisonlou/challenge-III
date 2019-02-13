@@ -14,10 +14,6 @@ class User():
         self._is_admin = kwags.get('is_admin', '')
 
     @property
-    def id(self):
-        return self._id
-
-    @property
     def email(self):
         return self._email
 

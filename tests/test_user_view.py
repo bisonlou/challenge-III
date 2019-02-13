@@ -58,7 +58,7 @@ class TestUserView(unittest.TestCase):
         """
         Test registering a user with an invalid email
         """
-        data = {'email': 'bisonlougmail.com'}
+        data = {'email': 'bisonlou.com'}
         response = base.register_user(data)
 
         self.assertEqual(response.status_code, 400)
@@ -85,7 +85,7 @@ class TestUserView(unittest.TestCase):
         """
         Test getting one user
         """
-        credentials = {'email': 'bisonlou@gmail.com',
+        credentials = {'email': 'bisonlou@ireporter.com',
                        'password': 'Pa$$word123'}
         token = base.get_token(credentials)
         response = base.get_users(token)
@@ -98,8 +98,6 @@ class TestUserView(unittest.TestCase):
         """
         credentials = {'email': 'bisonlou@gmail.com',
                        'password': 'Pa$$word123'}
-        data = {'is_admin': True}
-        response = base.register_user(data)
 
         token = base.get_token(credentials)
         response = base.get_users(token)

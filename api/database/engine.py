@@ -2,6 +2,7 @@ import psycopg2
 import psycopg2.extras
 from os import environ
 from api.models.incident_model import Incident
+from werkzeug.security import generate_password_hash
 
 
 class DbConnection():

@@ -104,32 +104,60 @@ class DbConnection():
 
         return incidents
 
-    def get_user_totals(self, user_id, incident_type):
-        total_incident_count = self.select_query_builder(
-            ['Count(id)'], 'incidents',
-            ['type', 'createdby'])
-        incident_values = (incident_type, user_id)
-        self.cursor.execute(total_incident_count, incident_values)
-        total_incidents = self.cursor.fetchone()
+    def get_all_totals(self):
+        redflag_totals = self.get_admin_type_totals('red-flag')
+        intervention_totals = self.get_admin_type_totals('intervention')
 
-        rejected_incident_count = self.select_query_builder(
-            ['Count(id)'], 'incidents',
-            ['type', 'status', 'createdby'])
-        total_rejected_values = (incident_type, 'rejected', user_id)
-        self.cursor.execute(rejected_incident_count, total_rejected_values)
-        total_rejected = self.cursor.fetchone()
+        return {**redflag_totals, **intervention_totals}
 
-        pending_incident_count = self.select_query_builder(
-            ['Count(id)'], 'incidents',
-            ['type', 'status', 'createdby'])
-        total_pending_values = (incident_type, 'pending', user_id)
-        self.cursor.execute(pending_incident_count, total_pending_values)
-        total_pending = self.cursor.fetchone()
+    def get_user_totals(self, user_id):
 
-        return {'total': total_incidents,
-                'pending': total_pending,
-                'rejected': total_rejected}
+        redflag_totals = self.get_user_type_totals('red-flag', user_id)
+        intervention_totals = self.get_user_type_totals('intervention', user_id)
 
+        return {**redflag_totals, **intervention_totals}
+
+    def get_user_type_totals(self, incident_type, user_id):
+        total = self.get_incident_count(
+                                ['type', 'createdby'],
+                                [incident_type, user_id])
+        
+        pending = self.get_incident_count(
+                            ['type', 'status', 'createdby'],
+                            [incident_type, 'pending', user_id])
+
+        rejected = self.get_incident_count(
+                            ['type', 'status', 'createdby'],
+                            [incident_type, 'rejected', user_id])             
+
+        return {'total_'+ incident_type: total,
+                'pending_'+ incident_type: pending,
+                'rejected_'+ incident_type: rejected}
+
+    def get_admin_type_totals(self, incident_type):
+        total = self.get_incident_count(
+                                ['type'],
+                                (incident_type, ))
+        
+        pending = self.get_incident_count(
+                            ['type', 'status'],
+                            (incident_type, 'pending'))
+
+        rejected = self.get_incident_count(
+                            ['type', 'status'],
+                            (incident_type, 'rejected'))             
+
+        return {'total_'+ incident_type: total,
+                'pending_'+ incident_type: pending,
+                'rejected_'+ incident_type: rejected}
+
+
+    def get_incident_count(self, consraints, values):
+        query = self.select_query_builder(
+            ['Count(id)'], 'incidents', consraints)
+        self.cursor.execute(query, values)
+        return self.cursor.fetchone()
+    
     def get_incident(self, incident_id):
         '''
         Function to get just one incident

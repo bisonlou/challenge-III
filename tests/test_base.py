@@ -85,11 +85,18 @@ class TestBase():
             '/api/v1/'+ types,
             headers={'Authorization': 'Bearer ' + token})
 
+    def get_totals(self, credentials):
+        token = self.post_n_get_token(credentials)
+
+        return test_client.get(
+            '/api/v1/incidents/totals',
+            headers={'Authorization': 'Bearer ' + token})
+
     def get_incident(self, credentials, incident_id):
         token  = self.post_n_get_token(credentials)
 
         return test_client.get(
-            '/api/v1/incident/'+ incident_id,
+            '/api/v1/incidents/'+ incident_id,
             headers={'Authorization': 'Bearer ' + token})
 
     def patch_incident(self, credentials, incident_id, key):

@@ -185,6 +185,14 @@ class TestRedFlagView(unittest.TestCase):
         response = base.delete_incident(self.admin_creds, '1')
         self.assertEqual(response.status_code, 403)
 
+    def test_get_user_totals(self):
+        """
+        Test getting all user totals
+        Expect 200
+        """
+        response = base.get_totals(self.credentials)
+        self.assertEqual(response.status_code, 200)
+
     def test_welcome(self):
         """
         Test deleting an incidents that doesnt exist

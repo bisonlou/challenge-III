@@ -42,7 +42,7 @@ def create_incident():
     return incident_controller.create_incident()
 
 
-@app.route('/api/v1/incident/<int:incident_id>',
+@app.route('/api/v1/incidents/<int:incident_id>',
            methods=['GET'])
 @jwt_required
 def get_incident(incident_id):
@@ -50,6 +50,16 @@ def get_incident(incident_id):
     Endpoint to get an incident
     """
     return incident_controller.get_incident(incident_id)
+
+
+
+@app.route('/api/v1/incidents/totals', methods=['GET'])
+@jwt_required
+def get_totals():
+    """
+    Endpoint to get all incident totals
+    """
+    return incident_controller.get_totals()
 
 
 @app.route('/api/v1/incidents/<int:incident_id>', methods=['PUT'])

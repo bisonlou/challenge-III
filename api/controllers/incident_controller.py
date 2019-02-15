@@ -8,7 +8,7 @@ from api.models.user_model import User
 from werkzeug.utils import secure_filename
 from api.database.engine import DbConnection
 from api.models.incident_model import Incident
-from api.utility.authenticator import get_identity
+from api.utility.authenticator import get_identity, verify_is_admin
 from api.validators.general_validator import(
     validate_incident,
     is_modifiable,
@@ -69,11 +69,23 @@ class IncidentController():
 
         incidents = db_services.get_all_incidents(user_id, incident_type)
 
-        incident_totals = db_services.get_user_totals(
-                            user_id, incident_type)
+        return jsonify({'status': 200, 'data': [incidents]})
 
-        return jsonify({'status': 200, 'data': [incidents],
-                       'totals': incident_totals})
+    def get_totals(self):
+        '''
+        Function to retun all incident totals
+        '''
+        user_id = get_identity()
+        is_admin = verify_is_admin()
+        incident_totals = ""
+
+        if is_admin is True:  
+            incident_totals = db_services.get_all_totals()
+        else:
+            incident_totals = db_services.get_user_totals(user_id)
+
+        return jsonify({'status': 200, 'data': incident_totals})
+
 
     def get_incident(self, incident_id):
         '''

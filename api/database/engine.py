@@ -120,19 +120,31 @@ class DbConnection():
     def get_user_type_totals(self, incident_type, user_id):
         total = self.get_incident_count(
                                 ['type', 'createdby'],
-                                [incident_type, user_id])
+                                (incident_type, user_id))
         
         pending = self.get_incident_count(
                             ['type', 'status', 'createdby'],
-                            [incident_type, 'pending', user_id])
+                            (incident_type, 'pending', user_id))
+
+        
+        resolved = self.get_incident_count(
+                            ['type', 'status', 'createdby'],
+                            (incident_type, 'resolved', user_id))
+
+        investigation = self.get_incident_count(
+                            ['type', 'status', 'createdby'],
+                            (incident_type, 'under investigation', user_id))
 
         rejected = self.get_incident_count(
                             ['type', 'status', 'createdby'],
-                            [incident_type, 'rejected', user_id])             
+                            (incident_type, 'rejected', user_id))         
 
         return {'total_'+ incident_type: total,
                 'pending_'+ incident_type: pending,
-                'rejected_'+ incident_type: rejected}
+                'rejected_'+ incident_type: rejected,
+                'resolved_'+ incident_type: resolved,
+                'investigation_'+ incident_type: investigation
+                }
 
     def get_admin_type_totals(self, incident_type):
         total = self.get_incident_count(
@@ -145,11 +157,37 @@ class DbConnection():
 
         rejected = self.get_incident_count(
                             ['type', 'status'],
-                            (incident_type, 'rejected'))             
+                            (incident_type, 'rejected'))    
+
+        resolved = self.get_incident_count(
+                            ['type', 'status'],
+                            (incident_type, 'resolved'))
+
+        investigation = self.get_incident_count(
+                            ['type', 'status'],
+                            (incident_type, 'under investigation')) 
+
+        users = self.select_query_builder(['Count(id)'], 'users', []) 
+        self.cursor.execute(users)
+        total_users = self.cursor.fetchone()  
+
+        admins = self.select_query_builder(['Count(id)'], 'users', ['isadmin']) 
+        self.cursor.execute(users, (True, ))
+        admin_count = self.cursor.fetchone() 
+
+        non_admins = self.select_query_builder(['Count(id)'], 'users', ['isadmin']) 
+        self.cursor.execute(users, (False, ))
+        non_admin_count = self.cursor.fetchone()         
 
         return {'total_'+ incident_type: total,
                 'pending_'+ incident_type: pending,
-                'rejected_'+ incident_type: rejected}
+                'rejected_'+ incident_type: rejected,
+                'resolved_'+ incident_type: resolved,
+                'investigation_'+ incident_type: investigation,
+                'users_count': total_users,
+                'admin_count': admin_count,
+                'non_admin_count': non_admin_count
+                }
 
 
     def get_incident_count(self, consraints, values):

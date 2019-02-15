@@ -69,7 +69,7 @@ class TestRedFlagView(unittest.TestCase):
         Test getting one red flags
         Expect 200
         """
-        response = base.get_incident(self.credentials, 'redflags', '1')
+        response = base.get_incident(self.credentials, '1')
         self.assertEqual(response.status_code, 200)
 
     def test_get_intervention(self):
@@ -77,7 +77,7 @@ class TestRedFlagView(unittest.TestCase):
         Test getting one intervention that does not exist
         Expect 200
         """
-        response = base.get_incident(self.credentials, 'interventions', '1')
+        response = base.get_incident(self.credentials, '1')
         self.assertEqual(response.status_code, 200)
 
     def test_get_non_existent_red_flag(self):
@@ -85,7 +85,7 @@ class TestRedFlagView(unittest.TestCase):
         Test getting one red flag that does not exist
         Expect 404
         """
-        response = base.get_incident(self.credentials, 'redflags', '2')
+        response = base.get_incident(self.credentials, '2')
         self.assertEqual(response.status_code, 404)
 
     def test_patch_incident_comment(self):

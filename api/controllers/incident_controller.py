@@ -67,8 +67,7 @@ class IncidentController():
         '''
         user_id = get_identity()
 
-        incidents = db_services.get_all_incidents(
-                    user_id, incident_type)
+        incidents = db_services.get_all_incidents(user_id)
 
         incident_totals = db_services.get_user_totals(
                             user_id, incident_type)
@@ -76,7 +75,7 @@ class IncidentController():
         return jsonify({'status': 200, 'data': [incidents],
                        'totals': incident_totals})
 
-    def get_incident(self, incident_type, incident_id):
+    def get_incident(self, incident_id):
         '''
         Function to retun an incident give an incident id
         Validates the incident exists and belongs to this user

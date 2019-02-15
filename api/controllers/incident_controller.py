@@ -67,7 +67,7 @@ class IncidentController():
         '''
         user_id = get_identity()
 
-        incidents = db_services.get_all_incidents(user_id)
+        incidents = db_services.get_all_incidents(user_id, incident_type)
 
         incident_totals = db_services.get_user_totals(
                             user_id, incident_type)

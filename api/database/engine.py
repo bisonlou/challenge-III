@@ -83,21 +83,22 @@ class DbConnection():
 
         return incident_id
 
-    def get_all_incidents(self, user_id):
+    def get_all_incidents(self, user_id, incident_type):
         # check if user is admin
         if self.check_user_is_admin(user_id):
             incidents_query = self.select_query_builder(
-                ['*'], 'incidents')
+                ['*'], 'incidents', ['type'])
+            data = (incident_type,)
 
-            self.cursor.execute(incidents_query)
+            self.cursor.execute(incidents_query, data)
             incidents = self.cursor.fetchall()
             return incidents
 
         else:
             incidents_query = self.select_query_builder(
                 ['*'], 'incidents',
-                ['createdby'])
-            incident_values = (user_id,)
+                ['type', 'createdby'])
+            incident_values = (incident_type, user_id)
             self.cursor.execute(incidents_query, incident_values)
             incidents = self.cursor.fetchall()
 

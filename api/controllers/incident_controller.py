@@ -185,7 +185,7 @@ class IncidentController():
         user_id = get_identity()      
         APP_ROOT = os.path.dirname(os.path.abspath('api/'))
         upload_folder = os.path.join(APP_ROOT, os.environ['UPLOAD_FOLDER'])
-                                    
+        print(APP_ROOT)
         incident = db_services.get_incident(incident_id)
         if not incident:
             return jsonify({'status': 404, 'errors':

@@ -203,7 +203,7 @@ class IncidentController():
                         ['image name cannot be empty']}), 400
 
         filename = secure_filename(image.filename)
-        image.save(os.path.join('..api/upload/images/', filename))
+        image.save(os.path.join('app/api/upload/images/', filename))
 
         db_services.add_incident_image(incident_id, filename)
             

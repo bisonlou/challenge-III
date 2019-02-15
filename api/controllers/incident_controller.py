@@ -184,7 +184,7 @@ class IncidentController():
     def patch_incident_image(self, incident_id):
         user_id = get_identity()      
         # APP_ROOT = os.path.dirname(os.path.abspath('api/'))
-        # upload_folder = os.path.join(APP_ROOT, os.environ['UPLOAD_FOLDER'])
+        upload_folder = os.environ['UPLOAD_FOLDER']
 
         incident = db_services.get_incident(incident_id)
         if not incident:
@@ -203,7 +203,7 @@ class IncidentController():
                         ['image name cannot be empty']}), 400
 
         filename = secure_filename(image.filename)
-        image.save(os.path.join('app/api/upload/images/', filename))
+        image.save(os.path.join(upload_folder, filename))
 
         db_services.add_incident_image(incident_id, filename)
             

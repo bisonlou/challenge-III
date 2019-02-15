@@ -172,11 +172,11 @@ class DbConnection():
         total_users = self.cursor.fetchone()  
 
         admins = self.select_query_builder(['Count(id)'], 'users', ['isadmin']) 
-        self.cursor.execute(users, (True, ))
+        self.cursor.execute(admins, (True, ))
         admin_count = self.cursor.fetchone() 
 
         non_admins = self.select_query_builder(['Count(id)'], 'users', ['isadmin']) 
-        self.cursor.execute(users, (False, ))
+        self.cursor.execute(non_admins, (False, ))
         non_admin_count = self.cursor.fetchone()         
 
         return {'total_'+ incident_type: total,

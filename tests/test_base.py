@@ -57,6 +57,11 @@ class TestBase():
                 '/api/v1/auth/users',
                 headers={'Authorization': 'Bearer ' + token})
 
+    def get_user(self, token):
+        return test_client.get(
+                '/api/v1/auth/user',
+                headers={'Authorization': 'Bearer ' + token})
+
     def post_n_get_token(self, credentials):
         token = self.get_token(credentials)
         self.post_incident(credentials)

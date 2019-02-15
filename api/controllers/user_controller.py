@@ -87,19 +87,18 @@ class UserController():
 
     def get_users(self):
         """
-        Function to login a user in case of anon admin
-        Adn get all users in case of an admin
-        The function a list of users
+        Function to get a list of users
+        Only admins permisable
+        """
+        users = db_services.get_users()    
+        return jsonify({'status': 200, 'data': [users]}), 200
+
+    def get_user(self):
+        """
+        The function returns a user
         """
         user_id = get_identity()
-        is_admin = verify_is_admin()
-        users = ""
-
-        if is_admin is True:
-            users = db_services.get_users()
-        else:
-            users = db_services.get_user_by_id(user_id)
-    
-        return jsonify({'status': 200, 'data': [users]}), 200
+        user = db_services.get_user_by_id(user_id)    
+        return jsonify({'status': 200, 'data': [user]}), 200
         
     

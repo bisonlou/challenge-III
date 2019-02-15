@@ -88,13 +88,25 @@ class TestUserView(unittest.TestCase):
         credentials = {'email': 'bisonlou@ireporter.com',
                        'password': 'Pa$$word123'}
         token = base.get_token(credentials)
-        response = base.get_users(token)
+        response = base.get_user(token)
 
         self.assertEqual(response.status_code, 200)
 
-    def test_get_users(self):
+    def test_get_users_as_admin(self):
         """
         Test getting one user as admin
+        """
+        credentials = {'email': 'bisonlou@gmail.com',
+                       'password': 'Pa$$word123'}
+
+        token = base.get_token(credentials)
+        response = base.get_user(token)
+
+        self.assertEqual(response.status_code, 200)
+
+    def test_get_users_as_admin(self):
+        """
+        Test getting users as admin
         """
         credentials = {'email': 'bisonlou@gmail.com',
                        'password': 'Pa$$word123'}
@@ -103,4 +115,16 @@ class TestUserView(unittest.TestCase):
         response = base.get_users(token)
 
         self.assertEqual(response.status_code, 200)
+
+    def test_get_users_as_non_admin(self):
+        """
+        Test getting users as non admin
+        """
+        credentials = {'email': 'bisonlou@ireporter.com',
+                       'password': 'Pa$$word123'}
+
+        token = base.get_token(credentials)
+        response = base.get_users(token)
+
+        self.assertEqual(response.status_code, 403)
     

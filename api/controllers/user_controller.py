@@ -37,7 +37,7 @@ class UserController():
 
         if is_duplicate_email(data['email']):
             return jsonify({'status': 409, 'errors': [
-                            'Conflict: user already registered']}), 409
+                            'User already registered']}), 409
 
         hashed_password = generate_password_hash(
             data['password'], method='sha256')
@@ -73,7 +73,7 @@ class UserController():
 
         if user is None:
             return jsonify({'status': 401, 'errors':
-                            ['incorrect credentials']}), 401
+                            ['There are problems with your login']}), 401
 
         if check_password_hash(user['password'], data['password']):
             access_token = create_access_token(user['id'], user['isadmin'])
@@ -83,7 +83,7 @@ class UserController():
                                 'access_token': access_token}
             return jsonify({'status': 200, 'data': [success_response]}), 200
 
-        return jsonify({'status': 401, 'errors': ['Unauthorised']}), 401     
+        return jsonify({'status': 401, 'errors': ['There are problems with your login']}), 401     
 
     def get_users(self):
         """

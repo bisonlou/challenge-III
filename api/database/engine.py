@@ -133,7 +133,7 @@ class DbConnection():
 
         investigation = self.get_incident_count(
                             ['type', 'status', 'createdby'],
-                            (incident_type, 'under investigation', user_id))
+                            (incident_type, 'investigating', user_id))
 
         rejected = self.get_incident_count(
                             ['type', 'status', 'createdby'],
@@ -165,7 +165,7 @@ class DbConnection():
 
         investigation = self.get_incident_count(
                             ['type', 'status'],
-                            (incident_type, 'under investigation')) 
+                            (incident_type, 'investigating')) 
 
         users = self.select_query_builder(['Count(id)'], 'users', []) 
         self.cursor.execute(users)

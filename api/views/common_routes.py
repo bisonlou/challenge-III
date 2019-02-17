@@ -1,5 +1,6 @@
-from flask import request, jsonify
+from flask import request, jsonify, send_from_directory
 from api import app
+import os
 from api.controllers.incident_controller import IncidentController
 from api.utility.authenticator import (jwt_required, admin_denied,
                                        json_data_required, admin_required)
@@ -125,3 +126,9 @@ def patch_incident_status(incident_id):
 def delete_red_flag(incident_id):
 
     return incident_controller.delete_incident(incident_id)
+
+@app.route('/api/v1/incidents/images/<path:fileName>', methods=['GET'])
+@jwt_required
+def serve_static(fileName):
+    root_dir = os.path.dirname(os.path.abspath('api/'))
+    return send_from_directory(os.path.join(root_dir, 'upload', 'images'),   fileName)  

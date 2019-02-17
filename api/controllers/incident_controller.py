@@ -215,6 +215,7 @@ class IncidentController():
 
         return jsonify({'status': 201, 'data': [success_response]}), 201
 
+
     def delete_incident(self, incident_id):
         '''
         Function to delete an incident

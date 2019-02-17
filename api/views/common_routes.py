@@ -130,5 +130,5 @@ def delete_red_flag(incident_id):
 @app.route('/api/v1/incidents/images/<path:fileName>', methods=['GET'])
 @jwt_required
 def serve_static(fileName):
-    root_dir = os.path.dirname(os.path.abspath('api/'))
-    return send_from_directory(os.path.join(root_dir, 'upload', 'images'),   fileName)  
+    upload_folder = os.environ['UPLOAD_FOLDER']
+    return send_from_directory(upload_folder, fileName)

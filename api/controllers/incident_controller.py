@@ -3,6 +3,7 @@ Module to handle incident CRUD operations
 """
 import os
 from api import app
+import logging
 from datetime import datetime
 from api.models.user_model import User
 from werkzeug.utils import secure_filename
@@ -204,7 +205,7 @@ class IncidentController():
 
         filename = secure_filename(image.filename)
         image.save(os.path.join(upload_folder, filename))
-
+        logging.debug(upload_folder)
         db_services.add_incident_image(incident_id, filename)
             
         success_response = {

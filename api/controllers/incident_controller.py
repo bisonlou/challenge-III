@@ -95,12 +95,17 @@ class IncidentController():
         If validation is passed an incident is returned
 
         '''
-        user_id = get_identity()
+        user_id = get_identity()        
         incident = db_services.get_incident(incident_id)
 
         if not incident:
             return jsonify({'status': 404, 'errors':
                             'Incident does not exist'}), 404
+
+        error = is_modifiable(incident, user_id)
+        if error:
+            return jsonify({'status': 403, 'errors': error}), 403
+
 
         return jsonify({'status': 200, 'data': [incident.to_dict()]}), 200
 

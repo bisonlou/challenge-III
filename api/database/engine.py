@@ -274,13 +274,9 @@ class DbConnection():
     def add_incident_image(self, incident_id, filename):
         '''
         Function to add an image to an incident
-        First deletes existing images
         Requires an incident id and the file name
         Returns a the image record id
-        '''
-        delete_query = self.delete_query_builder('images', ['incident'])
-        self.cursor.execute(delete_query, (incident_id, ))
-
+        '''        
         query = self.insert_query_builder(['incident', 'filename'], 'images')
         self.cursor.execute(query, (incident_id, filename))
 

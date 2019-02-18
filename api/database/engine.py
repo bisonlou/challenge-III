@@ -7,7 +7,6 @@ from api.models.incident_model import Incident
 class DbConnection():
 
     def __init__(self):
-        self.db_name = 'ireporter'
 
         try:
             self.connection = psycopg2.connect(environ.get('URI'))
@@ -43,7 +42,9 @@ class DbConnection():
         return self.get_user('email', login_email)
 
     def get_user(self, key, value):
-        select_query = self.select_query_builder('*', 'users', [key])
+        select_query = self.select_query_builder(
+                         ['*'],
+                         'users', [key])
 
         data = (value,)
         self.cursor.execute(select_query, data)
@@ -52,12 +53,24 @@ class DbConnection():
         if user:
             return user
 
+    def get_users(self):
+        select_query = self.select_query_builder(
+                         ['username', 'email', 'firstname', 'lastname',
+                          'othernames', 'phonenumber', 'dteregistered', 'isadmin'],
+                         'users', [])
+
+        self.cursor.execute(select_query)
+        users = self.cursor.fetchall()
+
+        if users:
+            return users
+
     def insert_incident(self, incident):
         fields = ['createdOn', 'title', 'comment', 'type',
-                  'createdby', 'location', 'status']
+                  'createdby', 'latitude', 'longitude', 'status']
         values = (incident.createdon, incident.title, incident.comment,
-                  incident.type, incident.createdby, incident.location,
-                  incident.status)
+                  incident.type, incident.createdby, incident.latitude,
+                  incident.longitude, incident.status)
 
         new_incident = self.insert_query_builder(fields, 'incidents')
         self.cursor.execute(new_incident, values)
@@ -91,37 +104,103 @@ class DbConnection():
 
         return incidents
 
-    def get_user_totals(self, user_id, incident_type):
-        total_incident_count = self.select_query_builder(
-            ['Count(id)'], 'incidents',
-            ['type', 'createdby'])
-        incident_values = (incident_type, user_id)
-        self.cursor.execute(total_incident_count, incident_values)
-        total_incidents = self.cursor.fetchone()
+    def get_all_totals(self):
+        redflag_totals = self.get_admin_type_totals('red-flag')
+        intervention_totals = self.get_admin_type_totals('intervention')
 
-        rejected_incident_count = self.select_query_builder(
-            ['Count(id)'], 'incidents',
-            ['type', 'status', 'createdby'])
-        total_rejected_values = (incident_type, 'rejected', user_id)
-        self.cursor.execute(rejected_incident_count, total_rejected_values)
-        total_rejected = self.cursor.fetchone()
+        return {**redflag_totals, **intervention_totals}
 
-        pending_incident_count = self.select_query_builder(
-            ['Count(id)'], 'incidents',
-            ['type', 'status', 'createdby'])
-        total_pending_values = (incident_type, 'pending', user_id)
-        self.cursor.execute(pending_incident_count, total_pending_values)
-        total_pending = self.cursor.fetchone()
+    def get_user_totals(self, user_id):
 
-        return {'total': total_incidents,
-                'pending': total_pending,
-                'rejected': total_rejected}
+        redflag_totals = self.get_user_type_totals('red-flag', user_id)
+        intervention_totals = self.get_user_type_totals('intervention', user_id)
 
+        return {**redflag_totals, **intervention_totals}
+
+    def get_user_type_totals(self, incident_type, user_id):
+        total = self.get_incident_count(
+                                ['type', 'createdby'],
+                                (incident_type, user_id))
+        
+        pending = self.get_incident_count(
+                            ['type', 'status', 'createdby'],
+                            (incident_type, 'pending', user_id))
+
+        
+        resolved = self.get_incident_count(
+                            ['type', 'status', 'createdby'],
+                            (incident_type, 'resolved', user_id))
+
+        investigation = self.get_incident_count(
+                            ['type', 'status', 'createdby'],
+                            (incident_type, 'investigating', user_id))
+
+        rejected = self.get_incident_count(
+                            ['type', 'status', 'createdby'],
+                            (incident_type, 'rejected', user_id))         
+
+        return {'total_'+ incident_type: total,
+                'pending_'+ incident_type: pending,
+                'rejected_'+ incident_type: rejected,
+                'resolved_'+ incident_type: resolved,
+                'investigation_'+ incident_type: investigation
+                }
+
+    def get_admin_type_totals(self, incident_type):
+        total = self.get_incident_count(
+                                ['type'],
+                                (incident_type, ))
+        
+        pending = self.get_incident_count(
+                            ['type', 'status'],
+                            (incident_type, 'pending'))
+
+        rejected = self.get_incident_count(
+                            ['type', 'status'],
+                            (incident_type, 'rejected'))    
+
+        resolved = self.get_incident_count(
+                            ['type', 'status'],
+                            (incident_type, 'resolved'))
+
+        investigation = self.get_incident_count(
+                            ['type', 'status'],
+                            (incident_type, 'investigating')) 
+
+        users = self.select_query_builder(['Count(id)'], 'users', []) 
+        self.cursor.execute(users)
+        total_users = self.cursor.fetchone()  
+
+        admins = self.select_query_builder(['Count(id)'], 'users', ['isadmin']) 
+        self.cursor.execute(admins, (True, ))
+        admin_count = self.cursor.fetchone() 
+
+        non_admins = self.select_query_builder(['Count(id)'], 'users', ['isadmin']) 
+        self.cursor.execute(non_admins, (False, ))
+        non_admin_count = self.cursor.fetchone()         
+
+        return {'total_'+ incident_type: total,
+                'pending_'+ incident_type: pending,
+                'rejected_'+ incident_type: rejected,
+                'resolved_'+ incident_type: resolved,
+                'investigation_'+ incident_type: investigation,
+                'users_count': total_users,
+                'admin_count': admin_count,
+                'non_admin_count': non_admin_count
+                }
+
+
+    def get_incident_count(self, consraints, values):
+        query = self.select_query_builder(
+            ['Count(id)'], 'incidents', consraints)
+        self.cursor.execute(query, values)
+        return self.cursor.fetchone()
+    
     def get_incident(self, incident_id):
         '''
         Function to get just one incident
-        Requires a user id to check user type
-        Returns a uder dictionary
+        Requires a user id to check for user rights
+        Returns a user dictionary
         '''
         incidents_query = self.select_query_builder('*', 'incidents', ['id'])
         data = (incident_id,)
@@ -147,11 +226,12 @@ class DbConnection():
         '''Function to update an incident'''
 
         update_query = self.update_query_builder(
-                        ['title', 'location', 'comment'],
+                        ['title', 'latitude', 'longitude', 'comment'],
                         'incidents',
                         ['id'])
         values = (update_incident.title,
-                  update_incident.location,
+                  update_incident.latitude,
+                  update_incident.longitude,
                   update_incident.comment,
                   update_incident.id)
 
@@ -169,9 +249,18 @@ class DbConnection():
         Updates an incident field
         Returns the updated incident"
         """
-        update_query = self.update_query_builder(
-                        [update_field], 'incidents', ['id'])
-        values = (getattr(update_incident, update_field), update_incident.id)
+        update_query = ""
+        values = ""
+
+        if update_field == 'location':
+            update_query = self.update_query_builder(
+                        ['latitude', 'longitude'], 'incidents', ['id'])
+            values = (update_incident.latitude, update_incident.longitude,
+                      update_incident.id)
+        else:
+            update_query = self.update_query_builder(
+                            [update_field], 'incidents', ['id'])
+            values = (getattr(update_incident, update_field), update_incident.id)
 
         self.cursor.execute(update_query, values)
         returned_data = self.cursor.fetchone()
@@ -182,7 +271,23 @@ class DbConnection():
 
             return updated_incident
 
+    def add_incident_image(self, incident_id, filename):
+        '''
+        Function to add an image to an incident
+        Requires an incident id and the file name
+        Returns a the image record id
+        '''        
+        query = self.insert_query_builder(['incident', 'filename'], 'images')
+        self.cursor.execute(query, (incident_id, filename))
+
+        return self.cursor.fetchone()['id']
+
     def delete_incident(self, incident_id):
+        '''
+        Function to delete one incident
+        Requires a an incident id
+        Returns the deleted incidents id
+        '''
         delete_incidents_query = self.delete_query_builder(
                                 'incidents',
                                 ['id'])
@@ -228,7 +333,7 @@ class DbConnection():
             query = self.insert_query_builder(fields, table)
             self.cursor.execute(query, values)
 
-    def select_query_builder(self, fields, table, contraints):
+    def select_query_builder(self, fields, table, constraints):
         ''' Function to concatenate select qurey strings and parameters'''
         query = 'SELECT '
 
@@ -241,16 +346,9 @@ class DbConnection():
                 query = query + field
         query = query + ' FROM ' + table
 
-        if len(contraints) > 0:
-            query = query + ' WHERE '
-
-            i = 1
-            for constraint in contraints:
-                if i < len(contraints):
-                    query = query + constraint + ' = %s AND '
-                    i += 1
-                else:
-                    query = query + constraint + ' = %s;'
+        if len(constraints) > 0:
+            query = query + ' WHERE '            
+            query = self.append_where_clauses(query, constraints, False)     
 
         return query
 
@@ -285,30 +383,28 @@ class DbConnection():
                 j += 1
             else:
                 query = query + field + ' = %s'
-        query = query + ' WHERE '
 
-        i = 0
-        for constraint in constraints:
-            if i + 1 < len(constraints):
-                query = query + constraint + ' = %s AND '
-                i += 1
-            else:
-                query = query + constraint + ' = %s'
-        query = query + ' RETURNING id'
+        query = query + ' WHERE '
+        query = self.append_where_clauses(query, constraints, True)
 
         return query
 
     def delete_query_builder(self, table, constraints):
         ''' Function to concatenate delete qurey strings and parameters'''
         query = 'DELETE FROM ' + table + ' WHERE '
+        query = self.append_where_clauses(query, constraints, True)
+
+        return query
+
+    def append_where_clauses(self, query, constraints, return_id):
         i = 1
         for constraint in constraints:
-            if i + 1 < len(constraints):
+            if i < len(constraints):
                 query = query + constraint + ' = %s AND '
                 i += 1
             else:
-                query = query + constraint + ' = %s'
-
-        query = query + ' RETURNING id;'
-
+                if return_id:
+                    query = query + constraint + ' = %s  RETURNING id;'
+                else:
+                    query = query + constraint + ' = %s;'        
         return query

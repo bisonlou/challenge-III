@@ -1,13 +1,15 @@
 """
 Module to handle incident CRUD operations
 """
-
+import os
 from api import app
+import logging
 from datetime import datetime
 from api.models.user_model import User
+from werkzeug.utils import secure_filename
 from api.database.engine import DbConnection
 from api.models.incident_model import Incident
-from api.utility.authenticator import get_identity
+from api.utility.authenticator import get_identity, verify_is_admin
 from api.validators.general_validator import(
     validate_incident,
     is_modifiable,
@@ -66,28 +68,44 @@ class IncidentController():
         '''
         user_id = get_identity()
 
-        incidents = db_services.get_all_incidents(
-                    user_id, incident_type)
+        incidents = db_services.get_all_incidents(user_id, incident_type)
 
-        incident_totals = db_services.get_user_totals(
-                            user_id, incident_type)
+        return jsonify({'status': 200, 'data': [incidents]})
 
-        return jsonify({'status': 200, 'data': [incidents],
-                       'totals': incident_totals})
+    def get_totals(self):
+        '''
+        Function to retun all incident totals
+        '''
+        user_id = get_identity()
+        is_admin = verify_is_admin()
+        incident_totals = ""
 
-    def get_incident(self, incident_type, incident_id):
+        if is_admin is True:  
+            incident_totals = db_services.get_all_totals()
+        else:
+            incident_totals = db_services.get_user_totals(user_id)
+
+        return jsonify({'status': 200, 'data': incident_totals})
+
+
+    def get_incident(self, incident_id):
         '''
         Function to retun an incident give an incident id
         Validates the incident exists and belongs to this user
         If validation is passed an incident is returned
 
         '''
-        user_id = get_identity()
+        user_id = get_identity()        
         incident = db_services.get_incident(incident_id)
 
         if not incident:
             return jsonify({'status': 404, 'errors':
                             'Incident does not exist'}), 404
+
+        error = is_modifiable(incident, user_id)
+        if error:
+            return jsonify({'status': 403, 'errors': error}), 403
+
 
         return jsonify({'status': 200, 'data': [incident.to_dict()]}), 200
 
@@ -161,18 +179,48 @@ class IncidentController():
 
         incident = db_services.patch_incident(
             update_incident, update_key)
-
-        if incident is None:
-            return jsonify({'status': 401, 'data':
-                            '{} not found'.format(incident_type)}), 200
-
         success_response = {
             'id': incident_id,
             'message':
             'Updated {} record’s {}'.format(incident_type, update_key)
         }
 
-        return jsonify({'status': 200, 'data': success_response}), 200
+        return jsonify({'status': 200, 'data': [success_response]}), 200
+
+    def patch_incident_image(self, incident_id):
+        user_id = get_identity()      
+        # APP_ROOT = os.path.dirname(os.path.abspath('api/'))
+        upload_folder = os.environ['UPLOAD_FOLDER']
+
+        incident = db_services.get_incident(incident_id)
+        if not incident:
+            return jsonify({'status': 404, 'errors':
+                            'incident not found'}), 404
+
+        errors = is_modifiable(incident, user_id)
+        if errors:
+            return jsonify({'status': 403, 'error': errors}), 403
+
+        incident_type = incident.type
+
+        image = request.files.get('image', '')
+        if image.filename == '':
+            return jsonify({'status': 400, 'errors':
+                        ['image name cannot be empty']}), 400
+
+        filename = secure_filename(image.filename)
+        image.save(os.path.join(upload_folder, filename))
+        logging.debug(upload_folder)
+        db_services.add_incident_image(incident_id, filename)
+            
+        success_response = {
+            'id': incident_id,
+            'message':
+            'Image added to {} record'.format(incident_type)
+            }
+
+        return jsonify({'status': 201, 'data': [success_response]}), 201
+
 
     def delete_incident(self, incident_id):
         '''

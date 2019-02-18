@@ -3,7 +3,7 @@ CREATE TABLE IF NOT EXISTS public.users
 (
     id SERIAL,
     username text COLLATE pg_catalog."default" NOT NULL,
-    email text COLLATE pg_catalog."default" NOT NULL,
+    email text COLLATE pg_catalog."default" UNIQUE NOT NULL,
     password text COLLATE pg_catalog."default" NOT NULL,
     firstname text COLLATE pg_catalog."default" NOT NULL,
     lastname text COLLATE pg_catalog."default" NOT NULL,
@@ -12,15 +12,7 @@ CREATE TABLE IF NOT EXISTS public.users
     dteregistered text COLLATE pg_catalog."default" NOT NULL,
     isadmin boolean NOT NULL,
     CONSTRAINT users_pkey PRIMARY KEY (id)
-)
-WITH (
-    OIDS = FALSE
-)
-TABLESPACE pg_default;
-
-ALTER TABLE public.users
-    OWNER to postgres;
-
+);
 
 
 CREATE TABLE IF NOT EXISTS public.incidents
@@ -31,22 +23,22 @@ CREATE TABLE IF NOT EXISTS public.incidents
     comment text COLLATE pg_catalog."default" NOT NULL,
     type character varying(25) COLLATE pg_catalog."default",
     createdby integer,
-    location character varying(50) COLLATE pg_catalog."default" NOT NULL,
+    latitude REAL,
+    longitude REAL,
     status character varying(20) COLLATE pg_catalog."default" NOT NULL,
     CONSTRAINT incidents_pkey PRIMARY KEY (id),
     CONSTRAINT incidents_createdby_fkey FOREIGN KEY (createdby)
         REFERENCES public.users (id) MATCH SIMPLE
         ON UPDATE CASCADE
         ON DELETE CASCADE
-)
-WITH (
-    OIDS = FALSE
-)
-TABLESPACE pg_default;
+);
 
-ALTER TABLE public.incidents
-    OWNER to postgres;
-
+INSERT INTO users  ( username, email, password, firstname,lastname, othernames,
+ phonenumber, dteregistered, isadmin)
+SELECT 'bison', 'bisonlou@gmail.com',
+'sha256$a8HCuuXl$7f933b02fa157f5c3faa17950bac0aced460cab2700ca7017c56d987b1ba918c',
+'Innocent', 'Lou', '','07553669897','2019-01-01', True
+WHERE NOT EXISTS ( SELECT id FROM users WHERE email = 'bisonlou@gmail.com');
 
 
 CREATE TABLE IF NOT EXISTS public.images
@@ -59,14 +51,7 @@ CREATE TABLE IF NOT EXISTS public.images
         REFERENCES public.incidents (id) MATCH SIMPLE
         ON UPDATE CASCADE
         ON DELETE CASCADE
-)
-WITH (
-    OIDS = FALSE
-)
-TABLESPACE pg_default;
-
-ALTER TABLE public.images
-    OWNER to postgres;
+);
 
 
 
@@ -80,11 +65,4 @@ CREATE TABLE IF NOT EXISTS public.videos
         REFERENCES public.incidents (id) MATCH SIMPLE
         ON UPDATE CASCADE
         ON DELETE CASCADE
-)
-WITH (
-    OIDS = FALSE
-)
-TABLESPACE pg_default;
-
-ALTER TABLE public.videos
-    OWNER to postgres;
+);

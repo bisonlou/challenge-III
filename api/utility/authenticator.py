@@ -20,7 +20,7 @@ def create_access_token(user_id, isAdmin=False):
     return token
 
 
-def decoded_token(token):
+def decode_token(token):
     """ 
     Function to decode the the token 
     """
@@ -70,12 +70,12 @@ def get_identity():
     """
     Retrieve user_id from the token
     """
-    return decoded_token(extract_token_from_header())["uid"]
+    return decode_token(extract_token_from_header())["uid"]
 
 
 def verify_is_admin():
     """Get user_role from the token"""
-    return decoded_token(extract_token_from_header())["adm"]
+    return decode_token(extract_token_from_header())["adm"]
 
 
 def admin_denied(function):

@@ -65,7 +65,7 @@ class ValidationHelpers():
 
     def is_proper_status(self, status):
         status_errors = []
-        accepted_status_values = ['pending', 'under investigation',
+        accepted_status_values = ['pending', 'investigating',
                                   'resolved', 'rejected']
         if status not in accepted_status_values:
             return 'status unknown'

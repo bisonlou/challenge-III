@@ -1,5 +1,6 @@
-from flask import request, jsonify
+from flask import request, jsonify, send_from_directory
 from api import app
+import os
 from api.controllers.incident_controller import IncidentController
 from api.utility.authenticator import (jwt_required, admin_denied,
                                        json_data_required, admin_required)
@@ -42,6 +43,26 @@ def create_incident():
     return incident_controller.create_incident()
 
 
+@app.route('/api/v1/incidents/<int:incident_id>',
+           methods=['GET'])
+@jwt_required
+def get_incident(incident_id):
+    """
+    Endpoint to get an incident
+    """
+    return incident_controller.get_incident(incident_id)
+
+
+
+@app.route('/api/v1/incidents/totals', methods=['GET'])
+@jwt_required
+def get_totals():
+    """
+    Endpoint to get all incident totals
+    """
+    return incident_controller.get_totals()
+
+
 @app.route('/api/v1/incidents/<int:incident_id>', methods=['PUT'])
 @jwt_required
 @admin_denied
@@ -77,6 +98,16 @@ def patch_incident_comment(incident_id):
 
     return incident_controller.patch_incident(incident_id, 'comment')
 
+@app.route('/api/v1/incidents/<int:incident_id>/addImage', methods=['PATCH'])
+@jwt_required
+@admin_denied
+def add_image(incident_id):
+    """
+    Endpoint to add incident image
+    """
+    
+    return incident_controller.patch_incident_image(incident_id)
+
 @app.route('/api/v1/incidents/<int:incident_id>/status',
            methods=['PATCH'])
 @jwt_required
@@ -95,3 +126,9 @@ def patch_incident_status(incident_id):
 def delete_red_flag(incident_id):
 
     return incident_controller.delete_incident(incident_id)
+
+@app.route('/api/v1/incidents/images/<path:fileName>', methods=['GET'])
+@jwt_required
+def serve_static(fileName):
+    upload_folder = os.environ['UPLOAD_FOLDER']
+    return send_from_directory(upload_folder, fileName)
